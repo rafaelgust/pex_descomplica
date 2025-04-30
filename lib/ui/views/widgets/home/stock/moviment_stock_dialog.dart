@@ -1,0 +1,407 @@
+import 'package:flutter/material.dart';
+
+import '../../../../../data/models/product_model.dart';
+import '../../../../../data/models/stock_model.dart';
+import '../../../../../data/services/injector/injector_service.dart';
+import '../../../../view_models/stock_view_model.dart';
+
+class MovimentStockDialog extends StatefulWidget {
+  final ProductModel product;
+  const MovimentStockDialog({super.key, required this.product});
+
+  @override
+  State<MovimentStockDialog> createState() => _MovimentStockDialogState();
+}
+
+class _MovimentStockDialogState extends State<MovimentStockDialog> {
+  final StockViewModel viewModel = injector.get<StockViewModel>();
+
+  final List<StockModel> _movimentStock = [];
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500, maxHeight: 700),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: theme.colorScheme.primary.withValues(
+                        alpha: 0.2,
+                      ),
+                      child: Icon(
+                        Icons.history,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Histórico de Movimentação',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          Text(
+                            widget.product.name,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.of(context).pop(),
+                      tooltip: 'Fechar',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Informações atuais
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Estoque Atual',
+                            style: theme.textTheme.labelMedium,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${widget.product.quantity} unidades',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Último valor de Entrada',
+                                style: theme.textTheme.labelMedium,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'R\$ 0,00',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                'Último valor de Saída',
+                                style: theme.textTheme.labelMedium,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'R\$ 0,00',
+                                style: theme.textTheme.labelMedium?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Container(
+                  height: 400,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: ListView(
+                    children: [
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.remove, color: Colors.green),
+                        ),
+                        title: Text(
+                          'Saída',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.add, color: Colors.blue),
+                        ),
+                        title: Text(
+                          'Entrada',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.remove, color: Colors.green),
+                        ),
+                        title: Text(
+                          'Saída',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.add, color: Colors.blue),
+                        ),
+                        title: Text(
+                          'Entrada',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.remove, color: Colors.green),
+                        ),
+                        title: Text(
+                          'Saída',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          child: Icon(Icons.add, color: Colors.blue),
+                        ),
+                        title: Text(
+                          'Entrada',
+                          style: theme.textTheme.titleMedium,
+                        ),
+                        subtitle: Text(
+                          'Quantidade: 0',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          spacing: 4,
+                          children: [
+                            Text(
+                              'Valor Unitário: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            Text(
+                              'Valor Total: R\$ 0,00',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                  ),
+                  child: const Text('Fechar'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

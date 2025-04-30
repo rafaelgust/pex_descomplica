@@ -1,14 +1,35 @@
 import 'package:flutter/material.dart';
 
-import 'activity_item.dart';
-import 'infor_card.dart';
+import 'widgets/home/dashboard/activity_item.dart';
+import 'widgets/home/dashboard/infor_card.dart';
 
-class DashboardWidget extends StatelessWidget {
-  const DashboardWidget({super.key});
+class DashboardView extends StatefulWidget {
+  const DashboardView({super.key});
+
+  @override
+  State<DashboardView> createState() => _DashboardViewState();
+}
+
+class _DashboardViewState extends State<DashboardView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
+  }
+
+  Future<void> _loadData() async {
+    // Simulate a network call or data fetching
+    await Future.delayed(const Duration(seconds: 1));
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Theme.of(context).colorScheme.onPrimary,
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [

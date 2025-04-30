@@ -21,7 +21,7 @@ class ModelButton extends StatelessWidget {
 
     this.alignment = Alignment.center,
 
-    this.backgroundColor = Colors.blue,
+    this.backgroundColor,
     this.foregroundColor = Colors.white,
   });
 
@@ -35,7 +35,7 @@ class ModelButton extends StatelessWidget {
         child: ElevatedButton(
           onPressed: isLoading ? null : () => onPressed(),
           style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor,
+            backgroundColor: backgroundColor ?? Theme.of(context).primaryColor,
             foregroundColor: foregroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../config/constants.dart';
-import 'responsive_helper.dart';
+import '../responsive_helper.dart';
 import '../../config/routers.dart';
 import '../view_models/login_view_model.dart';
 import 'widgets/model_button.dart';
@@ -25,7 +25,7 @@ class _LoginViewState extends State<LoginView> {
     // Verificar se o usuário já está autenticado
     viewModel.checkAuthentication().then((isAuthenticated) {
       if (isAuthenticated && mounted) {
-        goToPath(context, '/');
+        Routers.goToNamed(context, 'home');
       }
     });
   }
@@ -64,7 +64,7 @@ class _LoginViewState extends State<LoginView> {
                 Icon(
                   Icons.inventory_2_rounded,
                   size: _responsiveHelper.getIconSize(context),
-                  color: Colors.blue,
+                  color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(height: 24),
                 // APP NAME
@@ -74,7 +74,7 @@ class _LoginViewState extends State<LoginView> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
                 // Títulos
@@ -187,10 +187,10 @@ class _LoginViewState extends State<LoginView> {
                     onPressed: () {
                       viewModel.navigateToForgotPassword(context);
                     },
-                    child: const Text(
+                    child: Text(
                       'Esqueceu a senha?',
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Theme.of(context).primaryColor,
                         fontWeight: FontWeight.w500,
                       ),
                     ),

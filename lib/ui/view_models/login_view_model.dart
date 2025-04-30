@@ -77,7 +77,7 @@ class LoginViewModel extends ChangeNotifier {
         // Caso de sucesso (Right)
         (user) {
           if (context.mounted) {
-            goToPath(context, '/'); // Redireciona usando GoRouter
+            Routers.goToNamed(context, 'home');
           }
         },
       );
@@ -124,11 +124,11 @@ class LoginViewModel extends ChangeNotifier {
 
   // Método para navegar para a tela de registro
   void navigateToSignUp(BuildContext context) {
-    goToPath(context, '/signup');
+    Routers.goToPath(context, '/signup');
   }
 
   // Método para navegar para a tela de recuperação de senha
   void navigateToForgotPassword(BuildContext context) {
-    goToPath(context, '/forgot-password');
+    Routers.goToPath(context, '/forgot-password');
   }
 }
