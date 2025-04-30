@@ -6,6 +6,8 @@ import 'config/routers.dart';
 import 'data/services/injector/injector_service.dart';
 import 'data/services/pocket_base/pocket_base.dart';
 
+import 'package:flutter_web_plugins/url_strategy.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -16,7 +18,7 @@ void main() async {
 
 Future<void> _configureApp() async {
   if (kIsWeb) {
-    //remover #
+    usePathUrlStrategy();
   }
   await _initializeInjector();
 }
@@ -48,7 +50,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: appRouter(),
-      theme: ThemeData(),
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.orange),
       debugShowCheckedModeBanner: false,
     );
   }
