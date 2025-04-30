@@ -1,37 +1,33 @@
 import 'dart:convert';
+import 'dart:io' as io;
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 abstract class HttpService {
   /// Realiza uma requisição HTTP POST.
-  Future<http.Response> post(
-    String url,
-    Map<String, String> headers,
-    dynamic body,
-  );
+  Future<dynamic> post(String url, Map<String, String> headers, dynamic body);
 
   /// Realiza uma requisição HTTP GET.
-  Future<http.Response> get(String url, Map<String, String> headers);
+  Future<dynamic> get(String url, Map<String, String> headers);
 
   /// Realiza uma requisição HTTP PUT.
-  Future<http.Response> put(
-    String url,
-    Map<String, String> headers,
-    dynamic body,
-  );
+  Future<dynamic> put(String url, Map<String, String> headers, dynamic body);
 
   /// Realiza uma requisição HTTP DELETE.
-  Future<http.Response> delete(String url, Map<String, String> headers);
+  Future<dynamic> delete(String url, Map<String, String> headers);
 
   /// Realiza uma requisição HTTP PATCH.
-  Future<http.Response> patch(
-    String url,
-    Map<String, String> headers,
-    dynamic body,
-  );
+  Future<dynamic> patch(String url, Map<String, String> headers, dynamic body);
 
   /// Adiciona headers padrão a uma requisição.
   void addDefaultHeaders(Map<String, String> headers);
+
+  Future<http.MultipartFile> createMultipartFile({
+    required XFile xfile,
+    required String fieldName,
+  });
 }
 
 class HttpServiceImpl implements HttpService {
@@ -138,6 +134,32 @@ class HttpServiceImpl implements HttpService {
     } else {
       // Em produção, você pode enviar esses logs para um serviço de log.
       // Exemplo: enviar para Firebase ou outros serviços.
+    }
+  }
+
+  @override
+  Future<http.MultipartFile> createMultipartFile({
+    required XFile xfile,
+    required String fieldName,
+  }) async {
+    if (kIsWeb) {
+      final bytes = await xfile.readAsBytes();
+      return http.MultipartFile.fromBytes(
+        fieldName,
+        bytes,
+        filename: xfile.name,
+      );
+    } else {
+      final io.File file = io.File(xfile.path);
+      final stream = http.ByteStream(file.openRead());
+      final length = await file.length();
+
+      return http.MultipartFile(
+        fieldName,
+        stream,
+        length,
+        filename: xfile.path.split('/').last,
+      );
     }
   }
 }

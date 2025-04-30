@@ -59,6 +59,7 @@ class AuthServiceImplPocketBase implements AuthService {
     required String lastName,
   }) async {
     final response = await _pocketBase.register(
+      collection: 'users',
       body: {
         'email': email,
         'password': password,

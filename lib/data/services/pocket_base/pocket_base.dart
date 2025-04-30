@@ -1,3 +1,4 @@
+import 'package:http/http.dart' as http;
 import 'package:pocketbase/pocketbase.dart';
 
 import '../../../config/constants.dart';
@@ -20,6 +21,47 @@ class PocketBaseService {
   Future<PocketBaseService> initialize() async {
     instance._client = PocketBase(_apiUrl);
     return instance;
+  }
+
+  Future<ApiPocketBaseResponse<T>> getFullList<T>({
+    required String collection,
+    String filter = '',
+    String sort = '',
+    String expand = '',
+    String fields = '',
+  }) async {
+    try {
+      final result = await _client
+          .collection(collection)
+          .getFullList(
+            filter: filter,
+            sort: sort,
+            expand: expand,
+            fields: fields,
+          );
+
+      assert(
+        T == dynamic || T == Map<String, dynamic>,
+        'Use Map<String, dynamic> as generic type for lists',
+      );
+
+      return SuccessPocketBaseResponse<T>(
+        items: result.map((record) => record.toJson()).toList() as List<T>,
+        totalPages: 1,
+        totalItems: result.length,
+      );
+    } on ClientException catch (e) {
+      return ErrorPocketBaseResponse<T>(
+        statusCode: e.statusCode,
+        message: _parseError(e),
+      );
+    } catch (e, stack) {
+      return ErrorPocketBaseResponse<T>(
+        statusCode: 500,
+        message:
+            'System failure in getFullList: ${e.toString().substring(0, 50)} $stack',
+      );
+    }
   }
 
   Future<ApiPocketBaseResponse<T>> getList<T>({
@@ -191,19 +233,24 @@ class PocketBaseService {
     required String collection,
     required String id,
     required Map<String, dynamic> body,
+    String? expand,
+    List<http.MultipartFile>? files,
   }) async {
     String token = await _storage.getItem('token') ?? '';
+    files ??= [];
 
     try {
       final record = await _client
           .collection(collection)
           .update(
             id,
-            body: body,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $token',
             },
+            body: body,
+            files: files,
+            expand: expand,
           );
 
       assert(
@@ -234,6 +281,7 @@ class PocketBaseService {
   Future<ApiPocketBaseResponse<T>> create<T>({
     required String collection,
     required Map<String, dynamic> body,
+    String? expand,
   }) async {
     try {
       String token = await _storage.getItem('token') ?? '';
@@ -246,6 +294,7 @@ class PocketBaseService {
               'Authorization': 'Bearer $token',
             },
             body: body,
+            expand: expand,
           );
       return SuccessPocketBaseResponse<T>(
         items: [record.toJson() as T],
@@ -312,12 +361,17 @@ class PocketBaseService {
 
   // Método de registro
   Future<ApiPocketBaseResponse<T>> register<T>({
+    required String collection,
     required Map<String, dynamic> body,
+    String? expand,
+    List<http.MultipartFile>? files,
   }) async {
     try {
-      body['role'] = 'c2076w3yhdtn04j';
+      files ??= [];
 
-      final record = await _client.collection('users').create(body: body);
+      final record = await _client
+          .collection(collection)
+          .create(body: body, files: files, expand: expand);
 
       return SuccessPocketBaseResponse<T>(
         items: [record.toJson() as T],
