@@ -1,3 +1,4 @@
+import '../../../config/constants.dart';
 import 'role_model.dart';
 
 class UserModel {
@@ -16,6 +17,10 @@ class UserModel {
   final RoleModel role;
 
   String get fullName => '$firstName $lastName';
+  String get urlAvatar =>
+      avatar.isEmpty
+          ? Constants.defaultAvatar
+          : '${Constants.urlApi}/api/files/users/$id/$avatar';
 
   UserModel({
     this.collectionName,
