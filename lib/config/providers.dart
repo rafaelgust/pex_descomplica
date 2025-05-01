@@ -18,6 +18,7 @@ import '../data/services/storage/secure_storage_storage_service_imp.dart';
 import '../data/services/storage/storage_service.dart';
 import '../ui/view_models/customer_view_model.dart';
 import '../ui/view_models/home_view_model.dart';
+import '../ui/view_models/order_view_model.dart';
 import '../ui/view_models/stock_view_model.dart';
 import '../ui/view_models/supplier_view_model.dart';
 
@@ -85,5 +86,6 @@ class Providers {
     injector.registerLazySingleton<CustomerViewModel>(
       () => CustomerViewModel(),
     );
+    injector.registerLazySingleton<OrderViewModel>(() => OrderViewModel());
   }
 }
