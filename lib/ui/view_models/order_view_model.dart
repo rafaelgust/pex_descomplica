@@ -49,7 +49,7 @@ class OrderViewModel extends ChangeNotifier {
     if (searchText != null) {
       final escapedSearchText = searchText!.replaceAll('"', '\\"');
       filter =
-          'name~"$escapedSearchText" || register~"$escapedSearchText" || email~"$escapedSearchText" || telefone~"$escapedSearchText" || cep~"$escapedSearchText"';
+          'product.name~"$escapedSearchText" || supplier.name~"$escapedSearchText" || customer.name~"$escapedSearchText"';
     } else {
       filter = 'active==true';
     }
