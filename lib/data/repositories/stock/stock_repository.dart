@@ -153,6 +153,7 @@ class StockRepositoryImpl implements StockRepository {
       final stock = await _pocketBase.getOne(
         collection: 'stock_movements',
         id: id,
+        expand: 'product,supplier,customer,product.category',
       );
 
       return stock.when(
@@ -180,6 +181,7 @@ class StockRepositoryImpl implements StockRepository {
         page: page ?? 1,
         perPage: perPage ?? 30,
         filter: name != null ? 'product.name~"$name"' : '',
+        expand: 'product,supplier,customer,product.category',
       );
 
       return stocks.when(
@@ -209,6 +211,7 @@ class StockRepositoryImpl implements StockRepository {
         page: 1,
         perPage: 30,
         filter: 'product.name~"$name"',
+        expand: 'product,supplier,customer,product.category',
       );
 
       return stocks.when(
@@ -240,7 +243,7 @@ class StockRepositoryImpl implements StockRepository {
         page: page,
         perPage: perPage,
         filter: filter,
-        expand: 'category',
+        expand: 'product,supplier,customer,product.category',
         sort: '-updated',
       );
 

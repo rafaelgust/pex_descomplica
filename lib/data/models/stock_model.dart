@@ -38,7 +38,9 @@ class StockModel {
       collectionId: json['collectionId'] as String?,
       collectionName: json['collectionName'] as String?,
       id: json['id'] as String,
-      product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
+      product: ProductModel.fromJson(
+        json['expand']['product'] as Map<String, dynamic>,
+      ),
       quantity: json['quantity'] as int,
       price: json['price'] as int? ?? 0,
       movementType: json['movement_type'] as String,
@@ -47,14 +49,18 @@ class StockModel {
       supplier:
           json['supplier'] == null
               ? null
+              : json['supplier'] == ''
+              ? null
               : SupplierModel.fromJson(
-                json['supplier'] as Map<String, dynamic>,
+                json['expand']['supplier'] as Map<String, dynamic>,
               ),
       customer:
           json['customer'] == null
               ? null
+              : json['customer'] == ''
+              ? null
               : CustomerModel.fromJson(
-                json['customer'] as Map<String, dynamic>,
+                json['expand']['customer'] as Map<String, dynamic>,
               ),
       created:
           json['created'] == null
