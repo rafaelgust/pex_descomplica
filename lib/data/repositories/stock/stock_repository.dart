@@ -19,6 +19,15 @@ abstract class StockRepository {
     String? name,
   });
 
+  Future<Either<StockFailure, List<StockModel>>> getListWithFilter({
+    required String filter,
+    required int page,
+    required int perPage,
+  });
+  Future<Either<StockFailure, int>> getTotalItemsWithFilter({
+    required String filter,
+  });
+
   Future<Either<StockFailure, StockModel>> createItem({
     required String productId,
     required int quantity,
@@ -115,9 +124,25 @@ class StockRepositoryImpl implements StockRepository {
   }
 
   @override
-  Future<Either<StockFailure, bool>> deleteItem({required String id}) {
-    // TODO: implement deleteItem
-    throw UnimplementedError();
+  Future<Either<StockFailure, bool>> deleteItem({required String id}) async {
+    try {
+      final response = await _pocketBase.update(
+        collection: 'stock_movements',
+        id: id,
+        body: {'active': false},
+      );
+
+      return response.when(
+        success: (successResponse) async {
+          return Right(true);
+        },
+        error: (errorResponse) {
+          return const Left(UpdationFailure('Remove failed'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
   }
 
   @override
@@ -196,6 +221,63 @@ class StockRepositoryImpl implements StockRepository {
         },
         error: (errorResponse) {
           return const Left(StockSearchFailure('No stocks found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<StockFailure, List<StockModel>>> getListWithFilter({
+    required String filter,
+    required int page,
+    required int perPage,
+  }) async {
+    try {
+      final stockItems = await _pocketBase.getList(
+        collection: 'stock_movements',
+        page: page,
+        perPage: perPage,
+        filter: filter,
+        expand: 'category',
+        sort: '-updated',
+      );
+
+      return stockItems.when(
+        success: (successResponse) async {
+          return Right(
+            successResponse.items
+                .map((item) => StockModel.fromJson(item))
+                .toList(),
+          );
+        },
+        error: (errorResponse) {
+          return const Left(StockSearchFailure('No stock found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<StockFailure, int>> getTotalItemsWithFilter({
+    required String filter,
+  }) async {
+    try {
+      final stockItems = await _pocketBase.getList(
+        collection: 'stock_movements',
+        fields: 'id',
+        filter: filter,
+      );
+
+      return stockItems.when(
+        success: (successResponse) async {
+          return Right(successResponse.totalItems.toInt());
+        },
+        error: (errorResponse) {
+          return const Left(StockSearchFailure('No stock found'));
         },
       );
     } catch (e) {
