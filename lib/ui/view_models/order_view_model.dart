@@ -88,6 +88,7 @@ class OrderViewModel extends ChangeNotifier {
     required String movementType,
     required String reason,
     required String condition,
+    required int price,
     String? supplierId,
     String? customerId,
   }) async {
@@ -95,6 +96,7 @@ class OrderViewModel extends ChangeNotifier {
       final result = await _repository.createItem(
         productId: productId,
         quantity: quantity,
+        price: price,
         movementType: movementType,
         reason: reason,
         condition: condition,

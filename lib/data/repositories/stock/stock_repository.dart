@@ -34,6 +34,7 @@ abstract class StockRepository {
     required String movementType,
     required String reason,
     required String condition,
+    required int price,
     String? supplierId,
     String? customerId,
   });
@@ -58,6 +59,7 @@ class StockRepositoryImpl implements StockRepository {
     required String movementType,
     required String reason,
     required String condition,
+    required int price,
     String? supplierId,
     String? customerId,
   }) async {
@@ -71,6 +73,7 @@ class StockRepositoryImpl implements StockRepository {
       final body = {
         'product': productId,
         'quantity': quantity,
+        'price': price,
         'movement_type': movementType,
         'reason': reason,
         'condition': condition,
