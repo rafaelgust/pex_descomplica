@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/services/injector/injector_service.dart';
 import '../view_models/order_view_model.dart';
+import 'widgets/home/orders/order_not_found.dart';
+import 'widgets/home/orders/order_search_bar.dart';
 
 class OrdersView extends StatefulWidget {
   const OrdersView({super.key});
@@ -63,7 +65,43 @@ class _OrdersViewState extends State<OrdersView> {
 
     return RefreshIndicator(
       onRefresh: _refreshItems,
-      child: Center(child: Text('Pedidos em construção')),
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Theme.of(context).colorScheme.onPrimary,
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 16,
+          children: [
+            OrderSearchBar(
+              isSearching: _viewModel.isSearching,
+              initialValue: _viewModel.searchText,
+              onChange: (value) {
+                _viewModel.searchText = value;
+              },
+              onSearch: (value) => _viewModel.searchOrders(),
+            ),
+            Expanded(
+              child: AnimatedBuilder(
+                animation: _viewModel,
+                builder: (context, child) {
+                  if (_viewModel.isSearching) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (_viewModel.stockItems.isEmpty ||
+                      _viewModel.totalItems == 0) {
+                    return OrderNotFound();
+                  }
+
+                  return child!;
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
