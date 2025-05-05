@@ -2,25 +2,43 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'storage_service.dart';
 
 class SecureStorageStorageServiceImp implements StorageService {
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage(
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    mOptions: MacOsOptions(accessibility: KeychainAccessibility.first_unlock),
+  );
 
   static const String _accessTokenKey = 'access';
   static const String _refreshTokenKey = 'refresh';
 
   @override
   Future<void> setItem(String key, String value, {int? daysToExpire}) async {
-    await _secureStorage.write(key: key, value: value);
+    await _secureStorage.write(
+      key: key,
+      value: value,
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+      mOptions: MacOsOptions(accessibility: KeychainAccessibility.first_unlock),
+    );
   }
 
   @override
   Future<String?> getItem(String key) async {
-    return _secureStorage.read(key: key);
+    return _secureStorage.read(
+      key: key,
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+      mOptions: MacOsOptions(accessibility: KeychainAccessibility.first_unlock),
+    );
   }
 
   @override
   Future<void> deleteItem(String key) async {
     if (key != _accessTokenKey && key != _refreshTokenKey) {
-      await _secureStorage.delete(key: key);
+      await _secureStorage.delete(
+        key: key,
+        iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+        mOptions: MacOsOptions(
+          accessibility: KeychainAccessibility.first_unlock,
+        ),
+      );
     }
   }
 
@@ -36,8 +54,10 @@ class SecureStorageStorageServiceImp implements StorageService {
 
   // Implementação para tokens via FlutterSecureStorage
   @override
-  Future<void> setTokens(
-      {required String? access, required String? refresh}) async {
+  Future<void> setTokens({
+    required String? access,
+    required String? refresh,
+  }) async {
     await _secureStorage.write(key: _accessTokenKey, value: access);
     await _secureStorage.write(key: _refreshTokenKey, value: refresh);
   }
