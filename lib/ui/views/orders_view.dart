@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/stock_model.dart';
 import '../../data/services/injector/injector_service.dart';
 import '../view_models/order_view_model.dart';
+import 'widgets/home/orders/order_list.dart';
 import 'widgets/home/orders/order_not_found.dart';
 import 'widgets/home/orders/order_search_bar.dart';
 
@@ -30,6 +32,54 @@ class _OrdersViewState extends State<OrdersView> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _showEditOrderDialog(BuildContext context, StockModel stockItem) {}
+
+  void _showDeleteConfirmationDialog(
+    BuildContext context,
+    StockModel stockItem,
+  ) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirmar exclusão'),
+            content: Text(
+              'Deseja realmente excluir a ordem do produto "${stockItem.product.name}"?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Implementar exclusão do fornecedor
+                  _viewModel.deleteOrder(stockItem.id).then((success) {
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Fornecedor excluído com sucesso'),
+                        ),
+                      );
+                      _viewModel.searchOrders();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Erro ao excluir fornecedor'),
+                        ),
+                      );
+                    }
+                  });
+                },
+                child: const Text('Excluir'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -97,6 +147,15 @@ class _OrdersViewState extends State<OrdersView> {
 
                   return child!;
                 },
+                child: OrderList(
+                  orders: _viewModel.stockItems,
+                  totalItems: _viewModel.totalItems ?? 0,
+                  onEdit:
+                      (stockItem) => _showEditOrderDialog(context, stockItem),
+                  onDelete:
+                      (stockItem) =>
+                          _showDeleteConfirmationDialog(context, stockItem),
+                ),
               ),
             ),
           ],
