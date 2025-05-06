@@ -79,6 +79,7 @@ class StockRepositoryImpl implements StockRepository {
         'condition': condition,
         'supplier': supplierId,
         'customer': customerId,
+        'active': true,
       };
 
       final response = await _pocketBase.register(

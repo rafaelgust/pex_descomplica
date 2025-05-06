@@ -17,6 +17,13 @@ class StockModel {
   final DateTime? created;
   final DateTime? updated;
 
+  String get createdAt {
+    if (created != null) {
+      return '${created!.day.toString().padLeft(2, '0')}/${created!.month.toString().padLeft(2, '0')}/${created!.year}';
+    }
+    return '';
+  }
+
   StockModel({
     this.collectionId,
     this.collectionName,
