@@ -134,10 +134,6 @@ class _OrderListState extends State<OrderList> {
     );
   }
 
-  double _intToDecimal(int valorEmCentavos) {
-    return valorEmCentavos / 100;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -211,6 +207,10 @@ class _OrderListState extends State<OrderList> {
     );
   }
 
+  double _intToDecimal(int valorEmCentavos) {
+    return valorEmCentavos / 100;
+  }
+
   Widget _stockItemDecoredByType(String item, String type) {
     return Container(
       decoration: BoxDecoration(
@@ -246,8 +246,32 @@ class _OrderListState extends State<OrderList> {
         ),
       ),
       columns: [
-        DataColumn2(label: Text('Produto'), size: ColumnSize.L),
-        DataColumn2(label: Text('Tipo de movimentação'), size: ColumnSize.M),
+        DataColumn2(label: Text('Produto'), size: ColumnSize.S, fixedWidth: 70),
+        DataColumn2(
+          label: Text('Nome'),
+          size: ColumnSize.L,
+          onSort: (columnIndex, ascending) {
+            setState(() {
+              displayedOrders.sort(
+                (a, b) => a.product.name.toString().compareTo(
+                  b.product.name.toString(),
+                ),
+              );
+            });
+          },
+        ),
+        DataColumn2(
+          label: Text('Tipo de movimentação'),
+          size: ColumnSize.S,
+          onSort:
+              (columnIndex, ascending) => setState(() {
+                displayedOrders.sort(
+                  (a, b) => a.movementType.toString().compareTo(
+                    b.movementType.toString(),
+                  ),
+                );
+              }),
+        ),
         DataColumn2(
           label: Text('Quantidade'),
           size: ColumnSize.S,
@@ -255,6 +279,18 @@ class _OrderListState extends State<OrderList> {
         ),
         DataColumn2(label: Text('Preço'), size: ColumnSize.S, numeric: true),
         DataColumn2(label: Text('Cliente/Fornecedor'), size: ColumnSize.M),
+        DataColumn2(
+          label: Text('Criado em'),
+          size: ColumnSize.S,
+          onSort: (columnIndex, ascending) {
+            setState(() {
+              displayedOrders.sort(
+                (a, b) =>
+                    a.createdAt.toString().compareTo(b.createdAt.toString()),
+              );
+            });
+          },
+        ),
       ],
       rows:
           displayedOrders.map((order) {
@@ -263,71 +299,59 @@ class _OrderListState extends State<OrderList> {
               specificRowHeight: 56,
               cells: [
                 DataCell(
-                  Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color:
-                              Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        clipBehavior: Clip.antiAlias,
-                        child:
-                            order.product.urlImage == null
-                                ? Icon(
-                                  Icons.inventory_2,
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                  size: 28,
-                                )
-                                : Image.network(
-                                  order.product.urlImage!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (ctx, error, _) => Icon(
-                                        Icons.broken_image_outlined,
-                                        color:
-                                            Theme.of(
-                                              context,
-                                            ).colorScheme.onSurfaceVariant,
-                                        size: 28,
-                                      ),
-                                  loadingBuilder: (
-                                    ctx,
-                                    child,
-                                    loadingProgress,
-                                  ) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        value:
-                                            loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    loadingProgress
-                                                        .expectedTotalBytes!
-                                                : null,
-                                        strokeWidth: 2,
-                                      ),
-                                    );
-                                  },
-                                ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(order.product.name),
-                    ],
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color:
+                          Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child:
+                        order.product.urlImage == null
+                            ? Icon(
+                              Icons.inventory_2,
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                              size: 28,
+                            )
+                            : Image.network(
+                              order.product.urlImage!,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (ctx, error, _) => Icon(
+                                    Icons.broken_image_outlined,
+                                    color:
+                                        Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant,
+                                    size: 28,
+                                  ),
+                              loadingBuilder: (ctx, child, loadingProgress) {
+                                if (loadingProgress == null) {
+                                  return child;
+                                }
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
+                                    strokeWidth: 2,
+                                  ),
+                                );
+                              },
+                            ),
                   ),
                 ),
+                DataCell(Text(order.product.name)),
                 DataCell(
                   _stockItemDecoredByType(
                     order.movementType,
@@ -351,6 +375,9 @@ class _OrderListState extends State<OrderList> {
                     order.supplier?.name ?? order.customer?.name ?? '',
                     order.movementType,
                   ),
+                ),
+                DataCell(
+                  _stockItemDecoredByType(order.createdAt, order.movementType),
                 ),
               ],
             );
