@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import '../../../../../data/models/product_model.dart';
 import '../../../../responsive_helper.dart';
 
-import 'add_product_item.dart';
+import '../product/add_product_item.dart';
 import 'add_stock_dialog.dart';
 import 'moviment_stock_dialog.dart';
 import 'remove_stock_dialog.dart';
 
-class ProductStockList extends StatefulWidget {
+class StockList extends StatefulWidget {
   final List<ProductModel> products;
   final int initialPage;
   final int itemsPerPage;
   final int totalItems;
 
-  const ProductStockList({
+  const StockList({
     super.key,
     required this.products,
     this.initialPage = 1,
@@ -23,10 +23,10 @@ class ProductStockList extends StatefulWidget {
   });
 
   @override
-  State<ProductStockList> createState() => _ProductStockListState();
+  State<StockList> createState() => _StockListState();
 }
 
-class _ProductStockListState extends State<ProductStockList> {
+class _StockListState extends State<StockList> {
   late int currentPage;
   late List<ProductModel> displayedProducts;
   late int itemsPerPage;

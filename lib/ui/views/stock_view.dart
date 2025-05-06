@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/services/injector/injector_service.dart';
 import '../view_models/stock_view_model.dart';
-import 'widgets/home/stock/product_not_found.dart';
-import 'widgets/home/stock/product_stock_list.dart';
+import 'widgets/home/product/product_not_found.dart';
+import 'widgets/home/stock/stock_list.dart';
 
 class StockView extends StatefulWidget {
   const StockView({super.key});
@@ -333,7 +333,7 @@ class _StockViewState extends State<StockView> {
                     return ProductNotFound();
                   }
 
-                  return ProductStockList(
+                  return StockList(
                     products: _viewModel.products,
                     initialPage: 1,
                     itemsPerPage: 10,
