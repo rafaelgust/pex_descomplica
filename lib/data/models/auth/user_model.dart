@@ -22,6 +22,20 @@ class UserModel {
           ? Constants.defaultAvatar
           : '${Constants.urlApi}/api/files/users/$id/$avatar';
 
+  String get createdAt {
+    if (created != null) {
+      return '${created!.day.toString().padLeft(2, '0')}/${created!.month.toString().padLeft(2, '0')}/${created!.year}';
+    }
+    return '';
+  }
+
+  String get updatedAt {
+    if (updated != null) {
+      return '${updated!.day.toString().padLeft(2, '0')}/${updated!.month.toString().padLeft(2, '0')}/${updated!.year}';
+    }
+    return '';
+  }
+
   UserModel({
     this.collectionName,
     this.emailVisibility,

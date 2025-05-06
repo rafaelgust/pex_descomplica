@@ -445,6 +445,9 @@ class PocketBaseService {
         email,
         first_name,
         last_name,
+        created,
+        updated,
+        verified,
         expand.role.id,
         expand.role.name,
         '''.replaceAll(' ', '');
