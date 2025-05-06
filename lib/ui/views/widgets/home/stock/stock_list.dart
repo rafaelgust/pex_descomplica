@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../data/models/product_model.dart';
-import '../../../../responsive_helper.dart';
 
 import '../product/add_product_item.dart';
 import 'add_stock_dialog.dart';
@@ -139,7 +138,6 @@ class _StockListState extends State<StockList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final responsive = ResponsiveHelper();
 
     return Column(
       children: [

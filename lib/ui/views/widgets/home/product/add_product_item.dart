@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -22,9 +24,9 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
   final TextEditingController _barcodeController = TextEditingController();
 
   bool _isPerishable = false;
-  bool _active = true;
   String? _selectedCategoryId;
   XFile? _imageFile;
+  Uint8List? _imageBytes;
 
   @override
   void dispose() {
@@ -174,10 +176,13 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
                       onPressed: () {
                         _imagePickerService
                             .pickImage(source: ImageOrigin.gallery)
-                            .then((pickedFile) {
+                            .then((pickedFile) async {
                               if (pickedFile != null) {
+                                final bytes = await pickedFile.readAsBytes();
+
                                 setState(() {
                                   _imageFile = pickedFile;
+                                  _imageBytes = bytes;
                                 });
                               }
                             });
@@ -186,12 +191,34 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
                       label: const Text('Selecionar Imagem'),
                     ),
                   ),
-                  if (_imageFile != null) ...[
+                  if (_imageBytes != null) ...[
                     const SizedBox(width: 8),
                     const Icon(Icons.check_circle, color: Colors.green),
                   ],
                 ],
               ),
+              const SizedBox(height: 16),
+              if (_imageBytes != null) ...[
+                Image.memory(
+                  _imageBytes!,
+                  width: 52,
+                  height: 52,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (_imageBytes != null) ...[
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _imageFile = null;
+                      _imageBytes = null;
+                    });
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Remover Imagem'),
+                ),
+              ],
               const SizedBox(height: 16),
               SwitchListTile(
                 title: const Text('Produto Perecível'),
@@ -199,16 +226,6 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
                 onChanged: (value) {
                   setState(() {
                     _isPerishable = value;
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
-              ),
-              SwitchListTile(
-                title: const Text('Produto Ativo'),
-                value: _active,
-                onChanged: (value) {
-                  setState(() {
-                    _active = value;
                   });
                 },
                 contentPadding: EdgeInsets.zero,
