@@ -6,10 +6,40 @@ import '../../data/models/category_model.dart';
 import '../../data/models/product_model.dart';
 
 import '../../data/repositories/category/category_repository.dart';
+import '../../data/repositories/invoice/invoice_repository.dart';
 import '../../data/repositories/product/product_repository.dart';
+import '../../data/repositories/stock/stock_repository.dart';
 import '../../data/services/injector/injector_service.dart';
 
 class StockViewModel extends ChangeNotifier {
+  // Repositórios
+  final CategoryRepository _categoryRepository =
+      injector.get<CategoryRepository>();
+  final ProductRepository _productRepository =
+      injector.get<ProductRepository>();
+  final StockRepository _stockRepository = injector.get<StockRepository>();
+  final InvoiceRepository _invoiceRepository =
+      injector.get<InvoiceRepository>();
+
+  // Estado - Categorias
+  final ValueNotifier<List<CategoryModel>?> categories =
+      ValueNotifier<List<CategoryModel>?>(null);
+  final ValueNotifier<String?> errorCategories = ValueNotifier<String?>(null);
+
+  // Estado - Produtos
+  final List<ProductModel> products = [];
+  String? errorProducts;
+  int? totalProducts = 0;
+
+  // Estado - Busca de produtos
+  bool isSearching = false;
+  String? searchText = '';
+  String? selectedCategory = '';
+  int? quantityStock;
+
+  // Estado - Estoque
+  String? errorStock;
+
   @override
   void dispose() {
     categories.dispose();
@@ -17,91 +47,80 @@ class StockViewModel extends ChangeNotifier {
     super.dispose();
   }
 
-  // Fetch categories
-  final CategoryRepository _categoryRepository =
-      injector.get<CategoryRepository>();
-
-  final ValueNotifier<List<CategoryModel>?> categories =
-      ValueNotifier<List<CategoryModel>?>(null);
-
-  final ValueNotifier<String?> errorCategories = ValueNotifier<String?>(null);
-
+  /// Busca as categorias disponíveis
   Future<void> fetchCategories() async {
     try {
       final result = await _categoryRepository.getList(page: 1, perPage: 30);
       result.fold(
-        (error) {
-          errorCategories.value = 'Erro ao buscar categorias';
-        },
-        (categories) {
-          this.categories.value = categories;
-        },
+        (error) => errorCategories.value = 'Erro ao buscar categorias',
+        (data) => categories.value = data,
       );
     } catch (e) {
       errorCategories.value = e.toString();
     }
   }
 
-  // Fetch products
-  final ProductRepository _productRepository =
-      injector.get<ProductRepository>();
-
-  final List<ProductModel> products = [];
-
-  String? errorProducts;
-
-  bool isSearching = false;
-  String? searchText = '';
-  String? selectedCategory = '';
-  int? quantityStock;
-  int? totalProducts = 0;
-
+  /// Obtém o total de produtos com base no filtro aplicado
   Future<int> getQuantityProducts(String filter) async {
     try {
       final result = await _productRepository.getTotalItemsWithFilter(
         filter: filter,
       );
-      return result.fold(
-        (error) {
-          errorProducts = 'Erro ao buscar produtos';
-          return 0;
-        },
-        (total) {
-          return total;
-        },
-      );
+      return result.fold((error) {
+        errorProducts = 'Erro ao buscar quantidade de produtos';
+        return 0;
+      }, (total) => total);
     } catch (e) {
+      errorProducts = e.toString();
       return 0;
     }
   }
 
-  Future<void> searchProducts({int page = 1, int perPage = 30}) async {
-    if (isSearching == true) {
-      return;
+  /// Constrói o filtro para busca de produtos
+  String _buildProductFilter() {
+    final List<String> filters = [];
+
+    if (searchText != null && searchText!.isNotEmpty) {
+      filters.add('name~"$searchText"');
     }
+
+    if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+      filters.add('category.id="$selectedCategory"');
+    }
+
+    if (quantityStock != null) {
+      switch (quantityStock) {
+        case 0:
+          filters.add('quantity=0');
+          break;
+        case 1:
+          filters.add('quantity>0 && quantity<3');
+          break;
+        case 2:
+          filters.add('quantity>3');
+          break;
+      }
+    }
+
+    return filters.join(' && ');
+  }
+
+  /// Busca produtos com base nos filtros configurados
+  Future<void> searchProducts({int page = 1, int perPage = 30}) async {
+    if (isSearching) return;
+
     isSearching = true;
     products.clear();
     errorProducts = null;
     notifyListeners();
 
-    String filter = '';
-    if (searchText != null) {
-      filter += 'name~"$searchText"';
-    }
-    if (selectedCategory != null && selectedCategory!.isNotEmpty) {
-      filter += ' && category.id="$selectedCategory"';
-    }
-    if (quantityStock != null && quantityStock == 0) {
-      filter += ' && quantity=0';
-    } else if (quantityStock != null && quantityStock == 1) {
-      filter += ' && quantity>0 && quantity<3';
-    } else if (quantityStock != null && quantityStock == 2) {
-      filter += ' && quantity>3';
-    }
-
     try {
+      final String filter = _buildProductFilter();
+
       totalProducts = await getQuantityProducts(filter);
       if (totalProducts == 0) {
+        isSearching = false;
+        notifyListeners();
         return;
       }
 
@@ -112,12 +131,8 @@ class StockViewModel extends ChangeNotifier {
       );
 
       result.fold(
-        (error) {
-          errorProducts = 'Erro ao buscar produtos';
-        },
-        (products) {
-          this.products.addAll(products);
-        },
+        (error) => errorProducts = 'Erro ao buscar produtos',
+        (data) => products.addAll(data),
       );
     } catch (e) {
       errorProducts = e.toString();
@@ -127,6 +142,7 @@ class StockViewModel extends ChangeNotifier {
     }
   }
 
+  /// Cria um novo produto
   Future<bool> createProduct({
     required String name,
     String? description,
@@ -144,17 +160,106 @@ class StockViewModel extends ChangeNotifier {
         isPerishable: isPerishable,
         barcode: barcode,
       );
+
+      return result.fold((error) {
+        errorProducts = 'Erro ao criar produto';
+        return false;
+      }, (_) => true);
+    } catch (e) {
+      errorProducts = e.toString();
+      return false;
+    }
+  }
+
+  /// Cria um movimento de estoque e a nota fiscal associada
+  Future<bool> createStock({
+    required String productId,
+    required int quantity,
+    required String movementType,
+    required String reason,
+    required String condition,
+    required int price,
+    String? supplierId,
+    String? customerId,
+    String? invoiceCode,
+    required String invoiceStatus,
+    String? invoiceObservation,
+  }) async {
+    try {
+      final result = await _stockRepository.createItem(
+        productId: productId,
+        quantity: quantity,
+        price: price,
+        movementType: movementType,
+        reason: reason,
+        condition: condition,
+        supplierId: supplierId,
+        customerId: customerId,
+      );
+
       return result.fold(
         (error) {
-          errorProducts = 'Erro ao criar produto';
+          errorStock = 'Erro ao adicionar estoque';
           return false;
         },
-        (success) {
+        (stockMovement) async {
+          final invoiceResult = await _createInvoice(
+            stockMovementId: stockMovement.id,
+            code: invoiceCode,
+            status: invoiceStatus,
+            observation: invoiceObservation,
+          );
+
+          if (!invoiceResult) {
+            // Se falhar ao criar a nota fiscal, desfaz o movimento de estoque
+            await disableStockMovement(stockMovement.id);
+            return false;
+          }
+
           return true;
         },
       );
     } catch (e) {
-      errorProducts = e.toString();
+      errorStock = e.toString();
+      return false;
+    }
+  }
+
+  /// Desativa um movimento de estoque
+  Future<bool> disableStockMovement(String id) async {
+    try {
+      final result = await _stockRepository.deleteItem(id: id);
+      return result.fold((error) {
+        errorStock = 'Erro ao desativar a movimentação';
+        return false;
+      }, (_) => true);
+    } catch (e) {
+      errorStock = e.toString();
+      return false;
+    }
+  }
+
+  /// Cria uma nota fiscal associada a um movimento de estoque
+  Future<bool> _createInvoice({
+    required String stockMovementId,
+    String? code,
+    required String status,
+    String? observation,
+  }) async {
+    try {
+      final result = await _invoiceRepository.createItem(
+        code: code,
+        stockMovementId: stockMovementId,
+        status: status,
+        observation: observation,
+      );
+
+      return result.fold((error) {
+        errorStock = 'Erro ao criar nota fiscal';
+        return false;
+      }, (_) => true);
+    } catch (e) {
+      errorStock = e.toString();
       return false;
     }
   }

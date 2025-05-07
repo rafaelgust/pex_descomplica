@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:pex_descomplica/data/models/stock_model.dart';
-import 'package:pex_descomplica/data/services/injector/injector_service.dart';
 
 import '../../../../../data/models/product_model.dart';
+import '../../../../../data/models/supplier_model.dart';
+import '../../../../../data/services/injector/injector_service.dart';
 import '../../../../view_models/stock_view_model.dart';
+import '../../../../view_models/supplier_view_model.dart';
 
 class AddStockDialog extends StatefulWidget {
   final ProductModel product;
@@ -18,22 +19,29 @@ class AddStockDialog extends StatefulWidget {
 
 class _AddStockDialogState extends State<AddStockDialog> {
   final StockViewModel viewModel = injector.get<StockViewModel>();
+  final SupplierViewModel _supplierViewModel =
+      injector.get<SupplierViewModel>();
 
   final _formKey = GlobalKey<FormState>();
   final _quantityController = TextEditingController();
   final _priceController = TextEditingController();
   final _noteController = TextEditingController();
   final _supplierController = TextEditingController();
-  String? _reason;
-  String? _condition;
+  final _invoiceNumberController = TextEditingController();
+
+  String? _selectedSupplierId;
+  String? _reason = 'Compra';
+  String? _condition = 'Novo';
+  String? _invoiceStatus;
   DateTime _date = DateTime.now();
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
+    _supplierViewModel.searchSuppliers();
     // Preencher o preço com o valor atual do produto
-    _priceController.text = "0";
+    _priceController.text = "";
   }
 
   @override
@@ -42,6 +50,7 @@ class _AddStockDialogState extends State<AddStockDialog> {
     _priceController.dispose();
     _noteController.dispose();
     _supplierController.dispose();
+    _invoiceNumberController.dispose();
     super.dispose();
   }
 
@@ -81,19 +90,23 @@ class _AddStockDialogState extends State<AddStockDialog> {
       try {
         final quantity = int.parse(_quantityController.text);
         final price =
-            int.tryParse(_priceController.text.replaceAll(',', '.')) ?? 0;
+            int.tryParse(
+              _priceController.text.replaceAll(',', '').replaceAll('.', ''),
+            ) ??
+            0;
 
-        var movement = StockModel(
-          id: 'create',
-          product: widget.product,
+        await viewModel.createStock(
+          productId: widget.product.id,
           quantity: quantity,
           price: price,
           movementType: 'Entrada',
           reason: _reason!,
           condition: _condition!,
+          invoiceCode: _invoiceNumberController.text,
+          invoiceStatus: _invoiceStatus!,
+          invoiceObservation: _noteController.text,
+          supplierId: _selectedSupplierId,
         );
-
-        // await widget.viewModel.addStockMovement(movement);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -304,6 +317,73 @@ class _AddStockDialogState extends State<AddStockDialog> {
 
                   const SizedBox(height: 16),
 
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Motivo da Entrada',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          value: _reason,
+                          isExpanded: true,
+                          hint: const Text('Selecione o motivo'),
+                          onChanged: (value) {
+                            setState(() {
+                              _reason = value;
+                            });
+                          },
+                          items:
+                              [
+                                'Compra',
+                                'Doação',
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        flex: 2,
+                        child: DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Condição do Produto',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          value: _condition,
+                          isExpanded: true,
+                          hint: const Text('Selecione a condição'),
+                          onChanged: (value) {
+                            setState(() {
+                              _condition = value;
+                            });
+                          },
+                          items:
+                              [
+                                'Novo',
+                                'Bom Estado',
+                                'Usado',
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // Data
                   InkWell(
                     onTap: () => _selectDate(context),
@@ -324,36 +404,123 @@ class _AddStockDialogState extends State<AddStockDialog> {
                   const SizedBox(height: 16),
 
                   // Fornecedor
-                  TextFormField(
-                    controller: _supplierController,
-                    decoration: InputDecoration(
-                      labelText: 'Fornecedor',
-                      hintText: 'Nome do fornecedor',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      prefixIcon: const Icon(Icons.business),
-                    ),
+                  RawAutocomplete<SupplierModel>(
+                    textEditingController: _supplierController,
+                    focusNode: FocusNode(),
+                    optionsBuilder: (TextEditingValue textEditingValue) {
+                      if (textEditingValue.text == '') {
+                        return const Iterable<SupplierModel>.empty();
+                      }
+                      return _supplierViewModel.suppliers.where((
+                        SupplierModel option,
+                      ) {
+                        return option.name.toLowerCase().contains(
+                          textEditingValue.text.toLowerCase(),
+                        );
+                      });
+                    },
+                    displayStringForOption:
+                        (SupplierModel option) => option.name,
+                    onSelected: (SupplierModel supplier) {
+                      // Armazena o ID do fornecedor selecionado
+                      _selectedSupplierId = supplier.id;
+                      // Atualiza o controlador com o nome do fornecedor
+                      _supplierController.text = supplier.name;
+                    },
+                    fieldViewBuilder: (
+                      context,
+                      controller,
+                      focusNode,
+                      onFieldSubmitted,
+                    ) {
+                      return TextFormField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Fornecedor',
+                          hintText: 'Nome do fornecedor',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          prefixIcon: const Icon(Icons.business),
+                        ),
+                        onFieldSubmitted: (value) => onFieldSubmitted(),
+                      );
+                    },
+                    optionsViewBuilder: (context, onSelected, options) {
+                      return Align(
+                        alignment: Alignment.topLeft,
+                        child: Material(
+                          elevation: 4,
+                          borderRadius: BorderRadius.circular(8),
+                          child: SizedBox(
+                            width: 400,
+                            child: ListView.separated(
+                              padding: const EdgeInsets.all(8),
+                              shrinkWrap: true,
+                              itemCount: options.length,
+                              separatorBuilder:
+                                  (_, __) => const Divider(height: 1),
+                              itemBuilder: (context, index) {
+                                final option = options.elementAt(index);
+                                return ListTile(
+                                  title: Text(option.name),
+                                  onTap: () => onSelected(option),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 16),
 
                   // Nota fiscal
-                  // TextFormField(
-                  //   decoration: InputDecoration(
-                  //     labelText: 'Número da Nota Fiscal',
-                  //     hintText: 'Ex: NF-12345',
-                  //     border: OutlineInputBorder(
-                  //       borderRadius: BorderRadius.circular(8),
-                  //     ),
-                  //     prefixIcon: const Icon(Icons.receipt),
-                  //   ),
-                  //   onChanged: (value) {
-                  //     _invoiceNumber = value.isNotEmpty ? value : null;
-                  //   },
-                  // ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Número da Nota Fiscal',
+                      hintText: 'Ex: NF-12345',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      prefixIcon: const Icon(Icons.receipt),
+                    ),
+                    onChanged: (value) {
+                      _invoiceNumberController.text = value;
+                    },
+                  ),
 
-                  // const SizedBox(height: 16),
+                  const SizedBox(height: 16),
+
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Status do Pagamento',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      prefixIcon: const Icon(Icons.payments),
+                    ),
+                    value: _invoiceStatus,
+                    isExpanded: true,
+                    hint: const Text('Selecione o status'),
+                    onChanged: (value) {
+                      setState(() {
+                        _invoiceStatus = value;
+                      });
+                    },
+                    items:
+                        ['Pago', 'Pendente'].map<DropdownMenuItem<String>>((
+                          String value,
+                        ) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                  ),
+                  const SizedBox(height: 16),
 
                   // Observações
                   TextFormField(
