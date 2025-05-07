@@ -32,7 +32,7 @@ class ProductModel {
     this.barcode,
     required this.quantity,
     required this.active,
-    required this.category,
+    this.category,
     this.created,
     this.updated,
   });

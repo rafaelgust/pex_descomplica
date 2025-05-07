@@ -85,6 +85,7 @@ class StockRepositoryImpl implements StockRepository {
       final response = await _pocketBase.register(
         collection: 'stock_movements',
         body: body,
+        expand: 'product,supplier,customer,product.category',
       );
 
       return response.when(

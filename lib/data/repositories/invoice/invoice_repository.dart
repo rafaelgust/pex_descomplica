@@ -65,6 +65,8 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
       final response = await _pocketBase.register(
         collection: 'invoices',
         body: body,
+        expand:
+            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product, stock_movement.product.category',
       );
 
       return response.when(
@@ -92,6 +94,8 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         collection: 'invoices',
         id: id,
         body: body,
+        expand:
+            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product, stock_movement.product.category',
       );
 
       return response.when(
@@ -138,7 +142,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         collection: 'invoices',
         id: id,
         expand:
-            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product',
+            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product, stock_movement.product.category',
       );
 
       return invoice.when(
@@ -167,7 +171,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         perPage: perPage ?? 30,
         filter: code != null ? 'code~"$code"' : '',
         expand:
-            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product',
+            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product, stock_movement.product.category',
       );
 
       return invoices.when(
@@ -200,7 +204,7 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         perPage: perPage,
         filter: filter,
         expand:
-            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product',
+            'stock_movement,stock_movement.supplier,stock_movement.customer,stock_movement.product, stock_movement.product.category',
 
         sort: '-updated',
       );
