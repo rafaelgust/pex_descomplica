@@ -28,7 +28,6 @@ abstract class InvoiceRepository {
 
   Future<Either<InvoiceFailure, InvoiceModel>> createItem({
     String? code,
-    required int quantity,
     required String stockMovementId,
     required String status,
     String? observation,
@@ -50,7 +49,6 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
   @override
   Future<Either<InvoiceFailure, InvoiceModel>> createItem({
     String? code,
-    required int quantity,
     required String stockMovementId,
     required String status,
     String? observation,
@@ -58,7 +56,6 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
     try {
       final body = {
         'code': code,
-        'quantity': quantity,
         'stock_movement': stockMovementId,
         'status': status,
         'observation': observation,

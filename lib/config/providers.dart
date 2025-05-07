@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/category/category_repository.dart';
 import '../data/repositories/customer/customer_repository.dart';
+import '../data/repositories/invoice/invoice_repository.dart';
 import '../data/repositories/product/product_repository.dart';
 import '../data/repositories/stock/stock_repository.dart';
 import '../data/repositories/supplier/supplier_repository.dart';
@@ -71,6 +72,10 @@ class Providers {
 
     injector.registerFactory<SupplierRepository>(
       () => SupplierRepositoryImpl(pbService),
+    );
+
+    injector.registerFactory<InvoiceRepository>(
+      () => InvoiceRepositoryImpl(pbService),
     );
 
     // ===== ViewModels =====
