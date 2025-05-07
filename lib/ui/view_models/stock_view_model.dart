@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../data/models/category_model.dart';
 import '../../data/models/product_model.dart';
 
+import '../../data/models/stock_model.dart';
 import '../../data/repositories/category/category_repository.dart';
 import '../../data/repositories/invoice/invoice_repository.dart';
 import '../../data/repositories/product/product_repository.dart';
@@ -168,6 +169,25 @@ class StockViewModel extends ChangeNotifier {
     } catch (e) {
       errorProducts = e.toString();
       return false;
+    }
+  }
+
+  /// Pegar lista de movimentação de estoque pelo id do produto
+  Future<List<StockModel>?> getStockMovements(String productId) async {
+    try {
+      final result = await _stockRepository.getListWithFilter(
+        filter: 'product.id="$productId"',
+        page: 1,
+        perPage: 500,
+      );
+
+      return result.fold((error) {
+        errorStock = 'Erro ao buscar movimentação de estoque';
+        return null;
+      }, (data) => data);
+    } catch (e) {
+      errorStock = e.toString();
+      return null;
     }
   }
 
