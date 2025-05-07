@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'add_order_dialog.dart';
-
 class OrderNotFound extends StatelessWidget {
   const OrderNotFound({super.key});
 
@@ -23,19 +21,6 @@ class OrderNotFound extends StatelessWidget {
             style: theme.textTheme.titleLarge?.copyWith(
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AddOrderDialog();
-                },
-              );
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Adicionar Ordem'),
           ),
         ],
       ),

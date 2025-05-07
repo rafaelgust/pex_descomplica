@@ -2,7 +2,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../data/models/stock_model.dart';
-import 'add_order_dialog.dart';
 
 class OrderList extends StatefulWidget {
   final List<StockModel> orders;
@@ -90,15 +89,6 @@ class _OrderListState extends State<OrderList> {
     }
   }
 
-  void _showAddItemDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return const AddOrderDialog();
-      },
-    );
-  }
-
   void _showOptionsModal(BuildContext context, StockModel order) {
     showModalBottomSheet(
       context: context,
@@ -138,40 +128,6 @@ class _OrderListState extends State<OrderList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () => _showAddItemDialog(context),
-                icon: const Icon(Icons.add),
-                label: const Text('Nova Ordem'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-              OutlinedButton.icon(
-                onPressed: () {
-                  // Implementar exportação
-                },
-                icon: const Icon(Icons.download),
-                label: const Text('Exportar'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         Expanded(
           child: Card(
             elevation: 2,

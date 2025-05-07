@@ -82,42 +82,6 @@ class OrderViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> createOrder({
-    required String productId,
-    required int quantity,
-    required String movementType,
-    required String reason,
-    required String condition,
-    required int price,
-    String? supplierId,
-    String? customerId,
-  }) async {
-    try {
-      final result = await _repository.createItem(
-        productId: productId,
-        quantity: quantity,
-        price: price,
-        movementType: movementType,
-        reason: reason,
-        condition: condition,
-        supplierId: supplierId,
-        customerId: customerId,
-      );
-      return result.fold(
-        (error) {
-          errorOrders = 'Erro ao criar ordem';
-          return false;
-        },
-        (success) {
-          return true;
-        },
-      );
-    } catch (e) {
-      errorOrders = e.toString();
-      return false;
-    }
-  }
-
   Future<bool> updateOrder({
     required String id,
     required StockModel orderCopy,
