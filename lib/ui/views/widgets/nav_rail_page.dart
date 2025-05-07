@@ -4,7 +4,6 @@ import '../../../config/routers.dart';
 import '../../../data/services/injector/injector_service.dart';
 import '../../responsive_helper.dart';
 import '../../view_models/home_view_model.dart';
-import 'home/estoque_search_delegate.dart';
 import 'home/notifications_dialog.dart';
 
 class NavRailPage extends StatefulWidget {
@@ -74,17 +73,6 @@ class _NavRailPageState extends State<NavRailPage>
                     icon: const Icon(Icons.notifications_outlined),
                     onPressed: () => _showNotificationsDialog(context),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      showSearch(
-                        context: context,
-                        delegate: EstoqueSearchDelegate(),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 8),
                 ],
               )
               : null,
@@ -175,20 +163,7 @@ class _NavRailPageState extends State<NavRailPage>
                         ],
                       ),
                     ),
-                    trailing: Column(
-                      children: [
-                        const SizedBox(height: 20),
-                        IconButton(
-                          icon: const Icon(Icons.search),
-                          onPressed: () {
-                            showSearch(
-                              context: context,
-                              delegate: EstoqueSearchDelegate(),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.dashboard_outlined),
