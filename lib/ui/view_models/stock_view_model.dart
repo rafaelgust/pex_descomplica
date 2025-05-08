@@ -182,16 +182,7 @@ class StockViewModel extends ChangeNotifier {
         id: productId,
         itemsChanged: {'quantity': quantity},
       );
-      return result.fold(
-        (error) {
-          print('Erro ao atualizar quantidade do produto: $error');
-          return false;
-        },
-        (result) {
-          print('Quantidade atualizada com sucesso $result');
-          return true;
-        },
-      );
+      return result.fold((error) => false, (result) => true);
     } catch (e) {
       return false;
     }

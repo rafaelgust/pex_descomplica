@@ -95,18 +95,47 @@ class _AddStockDialogState extends State<AddStockDialog> {
             ) ??
             0;
 
-        await viewModel.createStock(
+        String formattedDate = DateFormat(
+          "yyyy-MM-ddTHH:mm:ss.mmmZ",
+        ).format(_date);
+
+        final newMovementStock = await viewModel.createStock(
           productId: widget.product.id,
+          productQuantity: widget.product.quantity,
           quantity: quantity,
           price: price,
           movementType: 'Entrada',
           reason: _reason!,
-          condition: _condition!,
-          invoiceCode: _invoiceNumberController.text,
-          invoiceStatus: _invoiceStatus!,
-          invoiceObservation: _noteController.text,
           supplierId: _selectedSupplierId,
+          condition: _condition!,
+          createdAt: formattedDate,
         );
+
+        if (newMovementStock == null) {
+          throw Exception('Erro ao criar movimentação de estoque');
+        } else {
+          int newQuantity = newMovementStock.product.quantity + quantity;
+
+          final changeProductQuantity = await viewModel.editProductQuantity(
+            productId: widget.product.id,
+            quantity: newQuantity,
+          );
+
+          if (changeProductQuantity) {
+            await viewModel
+                .createInvoice(
+                  stockMovementId: newMovementStock.id,
+                  code: _invoiceNumberController.text,
+                  status: _invoiceStatus!,
+                  observation: _noteController.text,
+                )
+                .catchError((error) {
+                  throw Exception('Erro ao criar nota fiscal: $error');
+                });
+          } else {
+            throw Exception('Erro ao atualizar quantidade do produto');
+          }
+        }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -115,6 +144,7 @@ class _AddStockDialogState extends State<AddStockDialog> {
               backgroundColor: Colors.green,
             ),
           );
+          viewModel.searchProducts();
           Navigator.of(context).pop(true);
         }
       } catch (e) {
