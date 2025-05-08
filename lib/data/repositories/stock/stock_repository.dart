@@ -35,6 +35,7 @@ abstract class StockRepository {
     required String reason,
     required String condition,
     required int price,
+    required String createdAt,
     String? supplierId,
     String? customerId,
   });
@@ -43,6 +44,8 @@ abstract class StockRepository {
     required String id,
     required Map<String, dynamic> itemsChanged,
   });
+
+  Future<Either<StockFailure, bool>> disableItem({required String id});
 
   Future<Either<StockFailure, bool>> deleteItem({required String id});
 }
@@ -60,6 +63,7 @@ class StockRepositoryImpl implements StockRepository {
     required String reason,
     required String condition,
     required int price,
+    required String createdAt,
     String? supplierId,
     String? customerId,
   }) async {
@@ -80,6 +84,7 @@ class StockRepositoryImpl implements StockRepository {
         'supplier': supplierId,
         'customer': customerId,
         'active': true,
+        'created': createdAt,
       };
 
       final response = await _pocketBase.register(
@@ -113,6 +118,7 @@ class StockRepositoryImpl implements StockRepository {
         collection: 'stock_movements',
         id: id,
         body: body,
+        expand: 'product,supplier,customer,product.category',
       );
 
       return response.when(
@@ -129,12 +135,33 @@ class StockRepositoryImpl implements StockRepository {
   }
 
   @override
-  Future<Either<StockFailure, bool>> deleteItem({required String id}) async {
+  Future<Either<StockFailure, bool>> disableItem({required String id}) async {
     try {
       final response = await _pocketBase.update(
         collection: 'stock_movements',
         id: id,
         body: {'active': false},
+      );
+
+      return response.when(
+        success: (successResponse) async {
+          return Right(true);
+        },
+        error: (errorResponse) {
+          return const Left(UpdationFailure('Remove failed'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<StockFailure, bool>> deleteItem({required String id}) async {
+    try {
+      final response = await _pocketBase.delete(
+        collection: 'stock_movements',
+        id: id,
       );
 
       return response.when(

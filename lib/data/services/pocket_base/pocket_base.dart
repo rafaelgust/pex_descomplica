@@ -314,6 +314,42 @@ class PocketBaseService {
     }
   }
 
+  // Método delete
+  Future<ApiPocketBaseResponse<T>> delete<T>({
+    required String collection,
+    required String id,
+  }) async {
+    try {
+      String token = await _storage.getItem('token') ?? '';
+
+      await _client
+          .collection(collection)
+          .delete(
+            id,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token',
+            },
+          );
+
+      return SuccessPocketBaseResponse<T>(
+        items: [],
+        totalPages: 1,
+        totalItems: 1,
+      );
+    } on ClientException catch (e) {
+      return ErrorPocketBaseResponse<T>(
+        statusCode: e.statusCode,
+        message: _parseError(e),
+      );
+    } catch (e) {
+      return ErrorPocketBaseResponse<T>(
+        statusCode: 500,
+        message: 'Error deleting record: ${e.toString()}',
+      );
+    }
+  }
+
   // Método authWithPassword
   Future<ApiPocketBaseResponse<T>> authWithPassword<T>({
     required String email,
