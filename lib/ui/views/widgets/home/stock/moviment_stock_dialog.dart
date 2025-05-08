@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../data/models/product_model.dart';
 import '../../../../../data/models/stock_model.dart';
 import '../../../../../data/services/injector/injector_service.dart';
+import '../../../../../data/services/internationalization/intl_service.dart';
 import '../../../../view_models/stock_view_model.dart';
 
 class MovimentStockDialog extends StatefulWidget {
@@ -225,6 +226,9 @@ class _MovimentStockDialogState extends State<MovimentStockDialog> {
     final isAdd = stock.movementType == 'Entrada';
     final total = stock.price * stock.quantity;
 
+    String formattedPrice = formatCurrency(stock.price);
+    String formattedTotal = formatCurrency(total);
+
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
@@ -249,13 +253,13 @@ class _MovimentStockDialogState extends State<MovimentStockDialog> {
         spacing: 4,
         children: [
           Text(
-            'Valor Unitário: R\$ ${stock.price}',
+            'Valor Unitário: $formattedPrice',
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.primary,
             ),
           ),
           Text(
-            'Valor Total: R\$ $total',
+            'Valor Total: $formattedTotal',
             style: theme.textTheme.labelMedium?.copyWith(
               color: theme.colorScheme.primary,
             ),
