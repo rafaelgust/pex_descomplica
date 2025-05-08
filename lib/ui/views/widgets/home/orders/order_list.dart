@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../data/models/stock_model.dart';
+import '../../../../../data/services/internationalization/intl_service.dart';
 
 class OrderList extends StatefulWidget {
   final List<StockModel> orders;
@@ -163,10 +164,6 @@ class _OrderListState extends State<OrderList> {
     );
   }
 
-  double _intToDecimal(int valorEmCentavos) {
-    return valorEmCentavos / 100;
-  }
-
   Widget _stockItemDecoredByType(String item, String type) {
     return Container(
       decoration: BoxDecoration(
@@ -215,6 +212,7 @@ class _OrderListState extends State<OrderList> {
               );
             });
           },
+          headingRowAlignment: MainAxisAlignment.center,
         ),
         DataColumn2(
           label: Text('Tipo de movimentação'),
@@ -227,14 +225,25 @@ class _OrderListState extends State<OrderList> {
                   ),
                 );
               }),
+          headingRowAlignment: MainAxisAlignment.center,
         ),
         DataColumn2(
           label: Text('Quantidade'),
           size: ColumnSize.S,
           numeric: true,
+          headingRowAlignment: MainAxisAlignment.center,
         ),
-        DataColumn2(label: Text('Preço'), size: ColumnSize.S, numeric: true),
-        DataColumn2(label: Text('Cliente/Fornecedor'), size: ColumnSize.M),
+        DataColumn2(
+          label: Text('Valor Unitário'),
+          size: ColumnSize.S,
+          numeric: true,
+          headingRowAlignment: MainAxisAlignment.center,
+        ),
+        DataColumn2(
+          label: Text('Cliente/Fornecedor'),
+          size: ColumnSize.M,
+          headingRowAlignment: MainAxisAlignment.center,
+        ),
         DataColumn2(
           label: Text('Criado em'),
           size: ColumnSize.S,
@@ -246,6 +255,7 @@ class _OrderListState extends State<OrderList> {
               );
             });
           },
+          headingRowAlignment: MainAxisAlignment.center,
         ),
       ],
       rows:
@@ -322,7 +332,7 @@ class _OrderListState extends State<OrderList> {
                 ),
                 DataCell(
                   _stockItemDecoredByType(
-                    'R\$ ${_intToDecimal(order.price).toStringAsFixed(2)}',
+                    formatCurrency(order.price),
                     order.movementType,
                   ),
                 ),
