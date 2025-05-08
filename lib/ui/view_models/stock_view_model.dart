@@ -172,6 +172,49 @@ class StockViewModel extends ChangeNotifier {
     }
   }
 
+  /// Update Product
+  Future<bool> updateProduct({
+    required ProductModel product,
+    required String name,
+    String? description,
+    required String categoryId,
+    XFile? imageFile,
+    bool isPerishable = false,
+    String? barcode,
+  }) async {
+    final Map<String, dynamic> itemsChanged = {};
+    if (product.name != name) {
+      itemsChanged['name'] = name;
+    }
+    if (product.description != description) {
+      itemsChanged['description'] = description;
+    }
+    if (product.category!.id != categoryId) {
+      itemsChanged['category'] = categoryId;
+    }
+    if (product.isPerishable != isPerishable) {
+      itemsChanged['isPerishable'] = isPerishable;
+    }
+    if (product.barcode != barcode) {
+      itemsChanged['barcode'] = barcode;
+    }
+    try {
+      final result = await _productRepository.updateItem(
+        id: product.id,
+        itemsChanged: itemsChanged,
+        imageFile: imageFile,
+      );
+
+      return result.fold((error) {
+        errorProducts = 'Erro ao atualizar produto';
+        return false;
+      }, (_) => true);
+    } catch (e) {
+      errorProducts = e.toString();
+      return false;
+    }
+  }
+
   /// Método para editar a quantidade do produto com base na inserção ou remoção de estoque
   Future<bool> editProductQuantity({
     required String productId,

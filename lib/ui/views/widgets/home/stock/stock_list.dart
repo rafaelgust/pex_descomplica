@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../../data/models/product_model.dart';
 
 import '../product/add_product_item.dart';
+import '../product/edit_product_item.dart';
 import 'add_stock_dialog.dart';
 import 'moviment_stock_dialog.dart';
 import 'remove_stock_dialog.dart';
@@ -98,6 +99,15 @@ class _StockListState extends State<StockList> {
       context: context,
       builder: (context) {
         return AddProductItemDialog();
+      },
+    );
+  }
+
+  void _showEditItemDialog(BuildContext context, ProductModel product) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return EditProductItemDialog(product: product);
       },
     );
   }
@@ -285,7 +295,10 @@ class _StockListState extends State<StockList> {
                                               ),
                                               onTap: () {
                                                 Navigator.pop(context);
-                                                // Adicionar preço
+                                                _showEditItemDialog(
+                                                  context,
+                                                  product,
+                                                );
                                               },
                                             ),
                                             ListTile(
