@@ -172,6 +172,31 @@ class StockViewModel extends ChangeNotifier {
     }
   }
 
+  /// Método para editar a quantidade do produto com base na inserção ou remoção de estoque
+  Future<bool> editProductQuantity({
+    required String productId,
+    required int quantity,
+  }) async {
+    try {
+      final result = await _productRepository.updateItem(
+        id: productId,
+        itemsChanged: {'quantity': quantity},
+      );
+      return result.fold(
+        (error) {
+          print('Erro ao atualizar quantidade do produto: $error');
+          return false;
+        },
+        (result) {
+          print('Quantidade atualizada com sucesso $result');
+          return true;
+        },
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Pegar lista de movimentação de estoque pelo id do produto
   Future<List<StockModel>?> getStockMovements(String productId) async {
     try {
@@ -192,19 +217,31 @@ class StockViewModel extends ChangeNotifier {
   }
 
   /// Cria um movimento de estoque e a nota fiscal associada
-  Future<bool> createStock({
+  Future<StockModel?> createStock({
     required String productId,
+    required int productQuantity,
     required int quantity,
     required String movementType,
     required String reason,
     required String condition,
     required int price,
+    required String createdAt,
     String? supplierId,
     String? customerId,
-    String? invoiceCode,
-    required String invoiceStatus,
-    String? invoiceObservation,
   }) async {
+    StockModel? newMovementStock;
+
+    if (quantity <= 0) {
+      throw 'Quantidade deve ser maior que zero';
+    }
+    if (movementType != 'Entrada' && movementType != 'Saída') {
+      throw 'Tipo de movimentação inválido';
+    }
+
+    if (productQuantity < quantity && movementType == 'Saída') {
+      throw 'Quantidade insuficiente em estoque';
+    }
+
     try {
       final result = await _stockRepository.createItem(
         productId: productId,
@@ -215,38 +252,29 @@ class StockViewModel extends ChangeNotifier {
         condition: condition,
         supplierId: supplierId,
         customerId: customerId,
+        createdAt: createdAt,
       );
 
-      return result.fold(
+      newMovementStock = await result.fold(
         (error) {
-          errorStock = 'Erro ao adicionar estoque';
-          return false;
+          throw 'Erro ao adicionar estoque';
         },
         (stockMovement) async {
-          final invoiceResult = await _createInvoice(
-            stockMovementId: stockMovement.id,
-            code: invoiceCode,
-            status: invoiceStatus,
-            observation: invoiceObservation,
-          );
-
-          if (!invoiceResult) {
-            // Se falhar ao criar a nota fiscal, desfaz o movimento de estoque
-            await disableStockMovement(stockMovement.id);
-            return false;
-          }
-
-          return true;
+          return stockMovement;
         },
       );
     } catch (e) {
-      errorStock = e.toString();
-      return false;
+      if (newMovementStock != null) {
+        await _deleteStockMovement(newMovementStock.id);
+      }
+      rethrow;
     }
+
+    return newMovementStock;
   }
 
   /// Desativa um movimento de estoque
-  Future<bool> disableStockMovement(String id) async {
+  Future<bool> _deleteStockMovement(String id) async {
     try {
       final result = await _stockRepository.deleteItem(id: id);
       return result.fold((error) {
@@ -260,7 +288,7 @@ class StockViewModel extends ChangeNotifier {
   }
 
   /// Cria uma nota fiscal associada a um movimento de estoque
-  Future<bool> _createInvoice({
+  Future<bool> createInvoice({
     required String stockMovementId,
     String? code,
     required String status,

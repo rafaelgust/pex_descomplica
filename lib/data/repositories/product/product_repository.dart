@@ -133,7 +133,7 @@ class ProductRepositoryImpl implements ProductRepository {
         collection: 'products',
         id: id,
         body: body,
-        files: [file],
+        files: imageFile != null ? [file] : null,
         expand: 'category',
       );
 
