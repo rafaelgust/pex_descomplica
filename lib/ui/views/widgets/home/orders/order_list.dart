@@ -53,6 +53,17 @@ class _OrderListState extends State<OrderList> {
     }
   }
 
+  Widget _showIconSortColumn(int columnIndex) {
+    if (_sortColumnIndex == columnIndex) {
+      return Icon(
+        _sortAscending ? Icons.arrow_upward : Icons.arrow_downward,
+        size: 16,
+        color: Colors.white,
+      );
+    }
+    return const Icon(Icons.arrow_upward, size: 16, color: Colors.transparent);
+  }
+
   void _updateDisplayedOrders() {
     totalPages = (widget.totalItems / itemsPerPage).ceil();
 
@@ -96,18 +107,20 @@ class _OrderListState extends State<OrderList> {
   void _sort<T>(
     Comparable<T> Function(InvoiceModel d) getField,
     int columnIndex,
-    bool ascending,
   ) {
     setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
+      if (_sortColumnIndex == columnIndex) {
+        _sortAscending = !_sortAscending;
+      } else {
+        _sortColumnIndex = columnIndex;
+        _sortAscending = true;
+      }
 
       displayedOrders.sort((a, b) {
         final aValue = getField(a);
         final bValue = getField(b);
-        return ascending
-            ? Comparable.compare(aValue, bValue as Comparable)
-            : Comparable.compare(bValue, aValue as Comparable);
+        final comparison = aValue.compareTo(bValue as T);
+        return _sortAscending ? comparison : -comparison;
       });
     });
   }
@@ -415,62 +428,71 @@ class _OrderListState extends State<OrderList> {
       showCheckboxColumn: false,
       columns: [
         DataColumn2(
-          label: const Text('Nome'),
+          label: Row(
+            children: [
+              const Text('Nome'),
+              const SizedBox(width: 8),
+              _showIconSortColumn(0),
+            ],
+          ),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sort<String>(
-              (d) => d.stockMovement!.product.name,
-              columnIndex,
-              ascending,
-            );
+            _sort<String>((d) => d.stockMovement!.product.name, columnIndex);
           },
         ),
         DataColumn2(
-          label: const Text('Tipo'),
+          label: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Tipo'),
+              const SizedBox(width: 8),
+              _showIconSortColumn(1),
+            ],
+          ),
           size: ColumnSize.S,
           headingRowAlignment: MainAxisAlignment.center,
           onSort: (columnIndex, ascending) {
-            _sort<String>(
-              (d) => d.stockMovement!.movementType,
-              columnIndex,
-              ascending,
-            );
+            _sort<String>((d) => d.stockMovement!.movementType, columnIndex);
           },
         ),
         DataColumn2(
-          label: const Text('Status'),
+          label: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+
+            children: [
+              const Text('Status'),
+              const SizedBox(width: 8),
+              _showIconSortColumn(2),
+            ],
+          ),
           size: ColumnSize.S,
           headingRowAlignment: MainAxisAlignment.center,
           numeric: true,
           onSort: (columnIndex, ascending) {
-            _sort<num>(
-              (d) => d.stockMovement!.quantity,
-              columnIndex,
-              ascending,
-            );
+            _sort<num>((d) => d.status == "Pago" ? 0 : 1, columnIndex);
           },
         ),
         DataColumn2(
-          label: const Text('Total do Pedido'),
+          label: Text('Total do Pedido'),
           size: ColumnSize.S,
           headingRowAlignment: MainAxisAlignment.center,
-
           numeric: true,
-          onSort: (columnIndex, ascending) {
-            _sort<num>((d) => d.stockMovement!.price, columnIndex, ascending);
-          },
         ),
-
         DataColumn2(
-          label: const Text('Criado em'),
+          label: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Criado em'),
+              const SizedBox(width: 8),
+              _showIconSortColumn(4),
+            ],
+          ),
           size: ColumnSize.S,
           headingRowAlignment: MainAxisAlignment.center,
-
           onSort: (columnIndex, ascending) {
             _sort<String>(
               (d) => d.stockMovement!.created!.toIso8601String(),
               columnIndex,
-              ascending,
             );
           },
         ),
