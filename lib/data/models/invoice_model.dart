@@ -7,6 +7,7 @@ class InvoiceModel {
   final String code;
   final StockModel? stockMovement;
   final String status;
+  final String? observation;
   final DateTime? created;
   final DateTime? updated;
 
@@ -17,6 +18,7 @@ class InvoiceModel {
     required this.code,
     this.stockMovement,
     required this.status,
+    this.observation,
     this.created,
     this.updated,
   });
@@ -28,6 +30,7 @@ class InvoiceModel {
       id: json['id'] as String,
       code: json['code'] as String,
       status: json['status'] as String,
+      observation: json['observation'] as String?,
       stockMovement:
           json['stock_movement'] == null
               ? null
