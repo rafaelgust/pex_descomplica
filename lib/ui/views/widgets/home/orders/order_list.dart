@@ -1,16 +1,17 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../data/models/stock_model.dart';
+import '../../../../../data/models/invoice_model.dart';
 import '../../../../../data/services/internationalization/intl_service.dart';
+import 'details/order_modal_details.dart';
 
 class OrderList extends StatefulWidget {
-  final List<StockModel> orders;
+  final List<InvoiceModel> orders;
   final int initialPage;
   final int itemsPerPage;
   final int totalItems;
-  final Function(StockModel)? onDelete;
-  final Function(StockModel)? onEdit;
+  final Function(InvoiceModel)? onDelete;
+  final Function(InvoiceModel)? onEdit;
 
   const OrderList({
     super.key,
@@ -28,9 +29,11 @@ class OrderList extends StatefulWidget {
 
 class _OrderListState extends State<OrderList> {
   late int currentPage;
-  late List<StockModel> displayedOrders;
+  late List<InvoiceModel> displayedOrders;
   late int itemsPerPage;
   late int totalPages;
+  bool _sortAscending = true;
+  int _sortColumnIndex = -1;
 
   @override
   void initState() {
@@ -90,36 +93,37 @@ class _OrderListState extends State<OrderList> {
     }
   }
 
-  void _showOptionsModal(BuildContext context, StockModel order) {
+  void _sort<T>(
+    Comparable<T> Function(InvoiceModel d) getField,
+    int columnIndex,
+    bool ascending,
+  ) {
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+
+      displayedOrders.sort((a, b) {
+        final aValue = getField(a);
+        final bValue = getField(b);
+        return ascending
+            ? Comparable.compare(aValue, bValue as Comparable)
+            : Comparable.compare(bValue, aValue as Comparable);
+      });
+    });
+  }
+
+  void _showOptionsModal(BuildContext context, InvoiceModel order) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (_) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.edit_outlined),
-              title: const Text('Editar ordem'),
-              onTap: () {
-                Navigator.pop(context);
-                widget.onEdit?.call(order);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text(
-                'Excluir ordem',
-                style: TextStyle(color: Colors.red),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-                widget.onDelete?.call(order);
-              },
-            ),
-          ],
+        return OrderModalDetails(
+          order: order,
+          onEdit: widget.onEdit,
+          onDelete: widget.onDelete,
         );
       },
     );
@@ -127,6 +131,9 @@ class _OrderListState extends State<OrderList> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
     return Column(
       children: [
         Expanded(
@@ -134,7 +141,7 @@ class _OrderListState extends State<OrderList> {
             elevation: 2,
             margin: const EdgeInsets.all(8.0),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(16),
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(
@@ -143,17 +150,14 @@ class _OrderListState extends State<OrderList> {
                 Expanded(
                   child:
                       displayedOrders.isEmpty
-                          ? Center(
-                            child: Text(
-                              'Nenhuma ordem disponível',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          )
+                          ? _buildEmptyState(context)
+                          : isSmallScreen
+                          ? _buildListView()
                           : _buildDataTable(),
                 ),
-                Divider(height: 1),
+                const Divider(height: 1),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: _buildPagination(),
                 ),
               ],
@@ -164,107 +168,68 @@ class _OrderListState extends State<OrderList> {
     );
   }
 
-  Widget _stockItemDecoredByType(String item, String type) {
-    return Container(
-      decoration: BoxDecoration(
-        color:
-            type == 'Entrada'
-                ? Colors.blue.withValues(alpha: 0.1)
-                : Colors.green.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.inventory_2_outlined,
+            size: 64,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Nenhuma ordem disponível',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'As ordens aparecerão aqui quando forem criadas',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            ),
+          ),
+        ],
       ),
-      padding: EdgeInsets.all(8),
-      child: Text(item),
     );
   }
 
-  Widget _buildDataTable() {
-    return DataTable2(
-      columnSpacing: 12,
-      horizontalMargin: 12,
-      minWidth: 600,
-      headingRowColor: WidgetStateProperty.resolveWith<Color>(
-        (Set<WidgetState> states) => Theme.of(context).colorScheme.primary,
-      ),
-      headingTextStyle: TextStyle(
-        color: Theme.of(context).colorScheme.onPrimary,
-        fontWeight: FontWeight.bold,
-      ),
-      headingRowHeight: 56,
-      dataRowHeight: 52,
-      border: TableBorder(
-        horizontalInside: BorderSide(
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-          width: 1,
-        ),
-      ),
-      columns: [
-        DataColumn2(label: Text('Produto'), size: ColumnSize.S, fixedWidth: 70),
-        DataColumn2(
-          label: Text('Nome'),
-          size: ColumnSize.L,
-          onSort: (columnIndex, ascending) {
-            setState(() {
-              displayedOrders.sort(
-                (a, b) => a.product.name.toString().compareTo(
-                  b.product.name.toString(),
-                ),
-              );
-            });
-          },
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-        DataColumn2(
-          label: Text('Tipo de movimentação'),
-          size: ColumnSize.S,
-          onSort:
-              (columnIndex, ascending) => setState(() {
-                displayedOrders.sort(
-                  (a, b) => a.movementType.toString().compareTo(
-                    b.movementType.toString(),
-                  ),
-                );
-              }),
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-        DataColumn2(
-          label: Text('Quantidade'),
-          size: ColumnSize.S,
-          numeric: true,
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-        DataColumn2(
-          label: Text('Valor Unitário'),
-          size: ColumnSize.S,
-          numeric: true,
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-        DataColumn2(
-          label: Text('Cliente/Fornecedor'),
-          size: ColumnSize.M,
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-        DataColumn2(
-          label: Text('Criado em'),
-          size: ColumnSize.S,
-          onSort: (columnIndex, ascending) {
-            setState(() {
-              displayedOrders.sort(
-                (a, b) =>
-                    a.createdAt.toString().compareTo(b.createdAt.toString()),
-              );
-            });
-          },
-          headingRowAlignment: MainAxisAlignment.center,
-        ),
-      ],
-      rows:
-          displayedOrders.map((order) {
-            return DataRow2(
-              onTap: () => _showOptionsModal(context, order),
-              specificRowHeight: 56,
-              cells: [
-                DataCell(
+  Widget _buildListView() {
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      itemCount: displayedOrders.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 8),
+      itemBuilder: (context, index) {
+        final order = displayedOrders[index];
+        final isInput = order.stockMovement!.movementType == 'Entrada';
+        final accentColor = isInput ? Colors.blue : Colors.green;
+
+        return Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Theme.of(
+                context,
+              ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+              width: 1,
+            ),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => _showOptionsModal(context, order),
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
                   Container(
                     width: 48,
                     height: 48,
@@ -275,7 +240,7 @@ class _OrderListState extends State<OrderList> {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child:
-                        order.product.urlImage == null
+                        order.stockMovement!.product.urlImage == null
                             ? Icon(
                               Icons.inventory_2,
                               color:
@@ -285,7 +250,7 @@ class _OrderListState extends State<OrderList> {
                               size: 28,
                             )
                             : Image.network(
-                              order.product.urlImage!,
+                              order.stockMovement!.product.urlImage!,
                               fit: BoxFit.cover,
                               errorBuilder:
                                   (ctx, error, _) => Icon(
@@ -316,34 +281,227 @@ class _OrderListState extends State<OrderList> {
                               },
                             ),
                   ),
-                ),
-                DataCell(Text(order.product.name)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          order.stockMovement!.product.name,
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: accentColor.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Text(
+                                order.stockMovement!.movementType,
+                                style: TextStyle(
+                                  color: accentColor,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              formatCurrency(order.stockMovement!.price),
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              order.stockMovement!.createdAt,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.bodySmall?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _invoiceItemDecoredByType(String item, String type) {
+    final isInput = type == 'Entrada';
+    final accentColor = isInput ? Colors.blue : Colors.green;
+
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: accentColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Text(
+          item,
+          style: TextStyle(color: accentColor, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusPayment(String status) {
+    final isPaid = status == 'Pago';
+    final accentColor = isPaid ? Colors.green : Colors.red;
+
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: accentColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: Text(
+          status,
+          style: TextStyle(color: accentColor, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDataTable() {
+    return DataTable2(
+      columnSpacing: 12,
+      horizontalMargin: 12,
+      minWidth: 600,
+      headingRowColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) => Theme.of(context).colorScheme.primary,
+      ),
+      headingTextStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onPrimary,
+        fontWeight: FontWeight.bold,
+      ),
+      headingRowHeight: 56,
+      dataRowHeight: 60,
+      border: TableBorder(
+        horizontalInside: BorderSide(
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+          width: 1,
+        ),
+      ),
+      dividerThickness: 1,
+      showCheckboxColumn: false,
+      columns: [
+        DataColumn2(
+          label: const Text('Nome'),
+          size: ColumnSize.L,
+          onSort: (columnIndex, ascending) {
+            _sort<String>(
+              (d) => d.stockMovement!.product.name,
+              columnIndex,
+              ascending,
+            );
+          },
+        ),
+        DataColumn2(
+          label: const Text('Tipo'),
+          size: ColumnSize.S,
+          headingRowAlignment: MainAxisAlignment.center,
+          onSort: (columnIndex, ascending) {
+            _sort<String>(
+              (d) => d.stockMovement!.movementType,
+              columnIndex,
+              ascending,
+            );
+          },
+        ),
+        DataColumn2(
+          label: const Text('Status'),
+          size: ColumnSize.S,
+          headingRowAlignment: MainAxisAlignment.center,
+          numeric: true,
+          onSort: (columnIndex, ascending) {
+            _sort<num>(
+              (d) => d.stockMovement!.quantity,
+              columnIndex,
+              ascending,
+            );
+          },
+        ),
+        DataColumn2(
+          label: const Text('Total do Pedido'),
+          size: ColumnSize.S,
+          headingRowAlignment: MainAxisAlignment.center,
+
+          numeric: true,
+          onSort: (columnIndex, ascending) {
+            _sort<num>((d) => d.stockMovement!.price, columnIndex, ascending);
+          },
+        ),
+
+        DataColumn2(
+          label: const Text('Criado em'),
+          size: ColumnSize.S,
+          headingRowAlignment: MainAxisAlignment.center,
+
+          onSort: (columnIndex, ascending) {
+            _sort<String>(
+              (d) => d.stockMovement!.created!.toIso8601String(),
+              columnIndex,
+              ascending,
+            );
+          },
+        ),
+      ],
+      rows:
+          displayedOrders.map((order) {
+            return DataRow2(
+              onTap: () => _showOptionsModal(context, order),
+              cells: [
+                DataCell(Text(order.stockMovement!.product.name)),
                 DataCell(
-                  _stockItemDecoredByType(
-                    order.movementType,
-                    order.movementType,
+                  _invoiceItemDecoredByType(
+                    order.stockMovement!.movementType,
+                    order.stockMovement!.movementType,
+                  ),
+                ),
+                DataCell(_buildStatusPayment(order.status)),
+                DataCell(
+                  _invoiceItemDecoredByType(
+                    formatCurrency(
+                      order.stockMovement!.price *
+                          order.stockMovement!.quantity,
+                    ),
+                    order.stockMovement!.movementType,
                   ),
                 ),
                 DataCell(
-                  _stockItemDecoredByType(
-                    order.quantity.toString(),
-                    order.movementType,
+                  _invoiceItemDecoredByType(
+                    order.stockMovement!.createdAt,
+                    order.stockMovement!.movementType,
                   ),
-                ),
-                DataCell(
-                  _stockItemDecoredByType(
-                    formatCurrency(order.price),
-                    order.movementType,
-                  ),
-                ),
-                DataCell(
-                  _stockItemDecoredByType(
-                    order.supplier?.name ?? order.customer?.name ?? '',
-                    order.movementType,
-                  ),
-                ),
-                DataCell(
-                  _stockItemDecoredByType(order.createdAt, order.movementType),
                 ),
               ],
             );
@@ -352,68 +510,197 @@ class _OrderListState extends State<OrderList> {
   }
 
   Widget _buildPagination() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        SizedBox(
-          width: 140,
-          height: 40,
-          child: Center(
-            child: TextField(
-              controller: TextEditingController(text: itemsPerPage.toString()),
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Itens por página',
-                border: const OutlineInputBorder(),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 8,
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
+    if (isSmallScreen) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton.icon(
+                onPressed: currentPage > 1 ? _previousPage : null,
+                icon: const Icon(Icons.chevron_left),
+                label: const Text('Anterior'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                isDense: true,
               ),
-              style: TextStyle(fontSize: 12),
-              onChanged: (text) {
-                final newValue = int.tryParse(text);
-                if (newValue != null && newValue > 0) {
-                  setState(() {
-                    itemsPerPage = newValue;
-                    _updateDisplayedOrders();
-                  });
-                }
-              },
-            ),
+              const SizedBox(width: 16),
+              Text(
+                '$currentPage / ${totalPages == 0 ? 1 : totalPages}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton.icon(
+                onPressed: currentPage < totalPages ? _nextPage : null,
+                icon: const Icon(Icons.chevron_right),
+                label: const Text('Próxima'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  foregroundColor: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(width: 16),
-        Text(
-          'Total de ordens: ${widget.totalItems}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(width: 16),
-        Text(
-          'Página $currentPage de ${totalPages == 0 ? 1 : totalPages}',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        const SizedBox(width: 16),
-        IconButton(
-          onPressed: currentPage > 1 ? _previousPage : null,
-          icon: const Icon(Icons.chevron_left),
-          tooltip: 'Página anterior',
-          disabledColor: Theme.of(context).disabledColor,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          '$currentPage',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 8),
-        IconButton(
-          onPressed: currentPage < totalPages ? _nextPage : null,
-          icon: const Icon(Icons.chevron_right),
-          tooltip: 'Próxima página',
-          disabledColor: Theme.of(context).disabledColor,
-        ),
-      ],
-    );
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total: ${widget.totalItems} ordens',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+              ),
+              SizedBox(
+                width: 100,
+                child: TextField(
+                  controller: TextEditingController(
+                    text: itemsPerPage.toString(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Itens',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    isDense: true,
+                  ),
+                  style: const TextStyle(fontSize: 12),
+                  onChanged: (text) {
+                    final newValue = int.tryParse(text);
+                    if (newValue != null && newValue > 0) {
+                      setState(() {
+                        itemsPerPage = newValue;
+                        _updateDisplayedOrders();
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Total: ${widget.totalItems} ordens',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+          ),
+          Row(
+            children: [
+              SizedBox(
+                width: 120,
+                height: 40,
+                child: TextField(
+                  controller: TextEditingController(
+                    text: itemsPerPage.toString(),
+                  ),
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Itens por página',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 8,
+                    ),
+                    isDense: true,
+                  ),
+                  style: const TextStyle(fontSize: 12),
+                  onChanged: (text) {
+                    final newValue = int.tryParse(text);
+                    if (newValue != null && newValue > 0) {
+                      setState(() {
+                        itemsPerPage = newValue;
+                        _updateDisplayedOrders();
+                      });
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 24),
+              Text(
+                'Página $currentPage de ${totalPages == 0 ? 1 : totalPages}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(width: 16),
+              IconButton(
+                onPressed: currentPage > 1 ? _previousPage : null,
+                icon: const Icon(Icons.chevron_left),
+                tooltip: 'Página anterior',
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      currentPage > 1
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest
+                          : null,
+                  foregroundColor:
+                      currentPage > 1
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).disabledColor,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  '$currentPage',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: currentPage < totalPages ? _nextPage : null,
+                icon: const Icon(Icons.chevron_right),
+                tooltip: 'Próxima página',
+                style: IconButton.styleFrom(
+                  backgroundColor:
+                      currentPage < totalPages
+                          ? Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainerHighest
+                          : null,
+                  foregroundColor:
+                      currentPage < totalPages
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).disabledColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
   }
 }
