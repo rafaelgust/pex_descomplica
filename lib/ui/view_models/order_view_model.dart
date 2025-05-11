@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/stock_model.dart';
+import '../../data/models/invoice_model.dart';
 
-import '../../data/repositories/stock/stock_repository.dart';
+import '../../data/repositories/invoice/invoice_repository.dart';
 import '../../data/services/injector/injector_service.dart';
 
 class OrderViewModel extends ChangeNotifier {
-  final StockRepository _repository = injector.get<StockRepository>();
+  final InvoiceRepository _repository = injector.get<InvoiceRepository>();
 
-  final List<StockModel> stockItems = [];
+  final List<InvoiceModel> invoiceItems = [];
 
   String? errorOrders;
 
@@ -16,7 +16,7 @@ class OrderViewModel extends ChangeNotifier {
   String? searchText = '';
   String? selectedCategory = '';
   int? quantityOrder;
-  int? totalItems = 0;
+  int? totalItems;
 
   Future<int> getQuantityProducts(String filter) async {
     try {
@@ -40,7 +40,7 @@ class OrderViewModel extends ChangeNotifier {
       return;
     }
     isSearching = true;
-    stockItems.clear();
+    invoiceItems.clear();
     errorOrders = null;
     notifyListeners();
 
@@ -49,7 +49,7 @@ class OrderViewModel extends ChangeNotifier {
     if (searchText != null) {
       final escapedSearchText = searchText!.replaceAll('"', '\\"');
       filter =
-          'product.name~"$escapedSearchText" || supplier.name~"$escapedSearchText" || customer.name~"$escapedSearchText"';
+          'stock_movement.product.name~"$escapedSearchText" || stock_movement.supplier.name~"$escapedSearchText" || stock_movement.customer.name~"$escapedSearchText"';
     } else {
       filter = 'active==true';
     }
@@ -71,7 +71,7 @@ class OrderViewModel extends ChangeNotifier {
           errorOrders = 'Erro ao buscar ordens';
         },
         (result) {
-          stockItems.addAll(result);
+          invoiceItems.addAll(result);
         },
       );
     } catch (e) {
@@ -84,7 +84,7 @@ class OrderViewModel extends ChangeNotifier {
 
   Future<bool> updateOrder({
     required String id,
-    required StockModel orderCopy,
+    required InvoiceModel orderCopy,
     required int quantity,
     required int price,
     required String movementType,
@@ -96,26 +96,26 @@ class OrderViewModel extends ChangeNotifier {
     try {
       Map<String, dynamic> itemsChanged = {};
 
-      if (quantity != orderCopy.quantity) {
-        itemsChanged['quantity'] = quantity;
+      if (quantity != orderCopy.stockMovement!.quantity) {
+        itemsChanged['stock_movement']['quantity'] = quantity;
       }
-      if (price != orderCopy.price) {
-        itemsChanged['price'] = price;
+      if (price != orderCopy.stockMovement!.price) {
+        itemsChanged['stock_movement']['price'] = price;
       }
-      if (movementType != orderCopy.movementType) {
-        itemsChanged['movement_type'] = movementType;
+      if (movementType != orderCopy.stockMovement!.movementType) {
+        itemsChanged['stock_movement']['movement_type'] = movementType;
       }
-      if (reason != orderCopy.reason) {
-        itemsChanged['reason'] = reason;
+      if (reason != orderCopy.stockMovement!.reason) {
+        itemsChanged['stock_movement']['reason'] = reason;
       }
-      if (condition != orderCopy.condition) {
-        itemsChanged['condition'] = condition;
+      if (condition != orderCopy.stockMovement!.condition) {
+        itemsChanged['stock_movement']['condition'] = condition;
       }
-      if (supplierId != orderCopy.supplier?.id) {
-        itemsChanged['supplier'] = supplierId;
+      if (supplierId != orderCopy.stockMovement!.supplier?.id) {
+        itemsChanged['stock_movement']['supplier'] = supplierId;
       }
-      if (customerId != orderCopy.customer?.id) {
-        itemsChanged['customer'] = customerId;
+      if (customerId != orderCopy.stockMovement!.customer?.id) {
+        itemsChanged['stock_movement']['customer'] = customerId;
       }
 
       if (itemsChanged.isEmpty) {

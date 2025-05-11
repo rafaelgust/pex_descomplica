@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../data/models/stock_model.dart';
+import '../../data/models/invoice_model.dart';
 import '../../data/services/injector/injector_service.dart';
 import '../view_models/order_view_model.dart';
 import 'widgets/home/orders/order_list.dart';
-import 'widgets/home/orders/order_not_found.dart';
 import 'widgets/home/orders/order_search_bar.dart';
 
 class OrdersView extends StatefulWidget {
@@ -34,11 +33,11 @@ class _OrdersViewState extends State<OrdersView> {
     super.dispose();
   }
 
-  void _showEditOrderDialog(BuildContext context, StockModel stockItem) {}
+  void _showEditOrderDialog(BuildContext context, InvoiceModel invoiceItem) {}
 
   void _showDeleteConfirmationDialog(
     BuildContext context,
-    StockModel stockItem,
+    InvoiceModel invoiceItem,
   ) {
     showDialog(
       context: context,
@@ -46,7 +45,7 @@ class _OrdersViewState extends State<OrdersView> {
           (context) => AlertDialog(
             title: const Text('Confirmar exclusão'),
             content: Text(
-              'Deseja realmente excluir a ordem do produto "${stockItem.product.name}"?',
+              'Deseja realmente excluir a ordem do produto "${invoiceItem.stockMovement!.product.name}"?',
             ),
             actions: [
               TextButton(
@@ -58,7 +57,7 @@ class _OrdersViewState extends State<OrdersView> {
                 onPressed: () {
                   Navigator.pop(context);
                   // Implementar exclusão do fornecedor
-                  _viewModel.deleteOrder(stockItem.id).then((success) {
+                  _viewModel.deleteOrder(invoiceItem.id).then((success) {
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -140,21 +139,17 @@ class _OrdersViewState extends State<OrdersView> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (_viewModel.stockItems.isEmpty ||
-                      _viewModel.totalItems == 0) {
-                    return OrderNotFound();
-                  }
-
                   return child!;
                 },
                 child: OrderList(
-                  orders: _viewModel.stockItems,
+                  orders: _viewModel.invoiceItems,
                   totalItems: _viewModel.totalItems ?? 0,
                   onEdit:
-                      (stockItem) => _showEditOrderDialog(context, stockItem),
+                      (invoiceItem) =>
+                          _showEditOrderDialog(context, invoiceItem),
                   onDelete:
-                      (stockItem) =>
-                          _showDeleteConfirmationDialog(context, stockItem),
+                      (invoiceItem) =>
+                          _showDeleteConfirmationDialog(context, invoiceItem),
                 ),
               ),
             ),
