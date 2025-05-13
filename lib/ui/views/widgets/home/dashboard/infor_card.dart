@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class InforCard extends StatelessWidget {
   final String title;
+  final String amount;
   final String value;
   final IconData icon;
   final Color color;
   const InforCard({
     super.key,
     required this.title,
+    required this.amount,
     required this.value,
     required this.icon,
     required this.color,
@@ -38,13 +40,27 @@ class InforCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 12,
+              children: [
+                Text(
+                  amount,
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Text(
