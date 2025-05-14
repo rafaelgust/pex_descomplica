@@ -1,17 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class MonthlyEntry {
-  final String month;
-  final double entrada;
-  final double saida;
-
-  MonthlyEntry({
-    required this.month,
-    required this.entrada,
-    required this.saida,
-  });
-}
+import '../../../../../../data/models/dashboard/monthly_bar_chart.dart';
 
 class BarChartWidget extends StatefulWidget {
   const BarChartWidget({
@@ -22,7 +12,7 @@ class BarChartWidget extends StatefulWidget {
     this.avgColor = Colors.amber,
   });
 
-  final List<MonthlyEntry> data;
+  final List<MonthlyBarChart> data;
   final Color leftBarColor;
   final Color rightBarColor;
   final Color avgColor;

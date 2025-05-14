@@ -1,22 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-class Produto {
-  final String nome;
-  final double quantidade;
-  final String imagemUrl;
-
-  Produto({
-    required this.nome,
-    required this.quantidade,
-    required this.imagemUrl,
-  });
-}
+import '../../../../../../data/models/dashboard/product_pie_chart.dart';
 
 class PieChartWidget extends StatefulWidget {
-  final List<Produto> produtos;
+  final List<ProductPieChart> products;
 
-  const PieChartWidget({super.key, required this.produtos});
+  const PieChartWidget({super.key, required this.products});
 
   @override
   State<PieChartWidget> createState() => PieChartWidgetState();
@@ -62,9 +52,9 @@ class PieChartWidgetState extends State<PieChartWidget> {
   }
 
   List<PieChartSectionData> showingSections(ThemeData theme) {
-    final total = widget.produtos.fold<double>(
+    final total = widget.products.fold<double>(
       0,
-      (sum, item) => sum + item.quantidade,
+      (sum, item) => sum + item.amount,
     );
 
     final colors = [
@@ -76,8 +66,8 @@ class PieChartWidgetState extends State<PieChartWidget> {
       theme.colorScheme.primaryContainer,
     ];
 
-    return List.generate(widget.produtos.length, (i) {
-      final produto = widget.produtos[i];
+    return List.generate(widget.products.length, (i) {
+      final produto = widget.products[i];
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 18.0 : 14.0;
       final radius = isTouched ? 110.0 : 95.0;
@@ -86,11 +76,11 @@ class PieChartWidgetState extends State<PieChartWidget> {
       final valuePercent =
           total == 0
               ? '0%'
-              : '${(produto.quantidade / total * 100).toStringAsFixed(1)}%';
+              : '${(produto.amount / total * 100).toStringAsFixed(1)}%';
 
       return PieChartSectionData(
         color: colors[i % colors.length],
-        value: produto.quantidade,
+        value: produto.amount,
         title: valuePercent,
         radius: radius,
         titleStyle: TextStyle(
@@ -100,7 +90,7 @@ class PieChartWidgetState extends State<PieChartWidget> {
           shadows: const [Shadow(color: Colors.black, blurRadius: 2)],
         ),
         badgeWidget: _BadgeImage(
-          imageUrl: produto.imagemUrl,
+          imageUrl: produto.urlImage,
           size: widgetSize,
           borderColor: theme.colorScheme.onSurface,
         ),
