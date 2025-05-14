@@ -104,4 +104,9 @@ class Providers {
     );
     injector.registerLazySingleton<OrderViewModel>(() => OrderViewModel());
   }
+
+  static Future<void> restart() async {
+    await injector.reset();
+    await setupControllers();
+  }
 }
