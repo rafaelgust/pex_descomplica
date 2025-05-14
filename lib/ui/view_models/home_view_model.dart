@@ -50,10 +50,8 @@ class HomeViewModel extends ChangeNotifier {
       case 4:
         return 'customers';
       case 5:
-        return 'reports';
-      case 6:
         return 'settings';
-      case 7:
+      case 6:
         return 'profile';
       default:
         return 'home';

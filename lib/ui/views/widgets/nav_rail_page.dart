@@ -181,19 +181,14 @@ class _NavRailPageState extends State<NavRailPage>
                         label: Text('Ordens'),
                       ),
                       NavigationRailDestination(
-                        icon: Icon(Icons.people_outline),
-                        selectedIcon: Icon(Icons.people),
+                        icon: Icon(Icons.business_outlined),
+                        selectedIcon: Icon(Icons.business),
                         label: Text('Fornecedores'),
                       ),
                       NavigationRailDestination(
                         icon: Icon(Icons.people_outline),
                         selectedIcon: Icon(Icons.people),
                         label: Text('Clientes'),
-                      ),
-                      NavigationRailDestination(
-                        icon: Icon(Icons.bar_chart_outlined),
-                        selectedIcon: Icon(Icons.bar_chart),
-                        label: Text('Relatórios'),
                       ),
                       NavigationRailDestination(
                         icon: Icon(Icons.settings_outlined),
@@ -354,19 +349,9 @@ class _NavRailPageState extends State<NavRailPage>
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.bar_chart_outlined),
-            title: const Text('Relatórios'),
-            selected: _homeViewModel.selectedIndex == 5,
-            onTap: () {
-              _homeViewModel.onItemTapped(5);
-              Routers.goToNamed(context, _homeViewModel.selectedViewName);
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.settings_outlined),
             title: const Text('Configurações'),
-            selected: _homeViewModel.selectedIndex == 6,
+            selected: _homeViewModel.selectedIndex == 5,
             onTap: () {
               _homeViewModel.onItemTapped(6);
               Routers.goToNamed(context, _homeViewModel.selectedViewName);
@@ -377,7 +362,7 @@ class _NavRailPageState extends State<NavRailPage>
           ListTile(
             leading: const Icon(Icons.person_outline),
             title: const Text('Perfil'),
-            selected: _homeViewModel.selectedIndex == 7,
+            selected: _homeViewModel.selectedIndex == 6,
             onTap: () {
               _homeViewModel.onItemTapped(7);
               Routers.goToNamed(context, _homeViewModel.selectedViewName);

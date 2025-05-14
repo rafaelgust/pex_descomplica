@@ -11,7 +11,6 @@ import '../ui/views/dashboard_view.dart';
 import '../ui/views/login_view.dart';
 import '../ui/views/orders_view.dart';
 import '../ui/views/profile_view.dart';
-import '../ui/views/reports_view.dart';
 import '../ui/views/settings_view.dart';
 import '../ui/views/stock_view.dart';
 import '../ui/views/suppliers_view.dart';
@@ -140,16 +139,6 @@ GoRouter appRouter() {
                   context: context,
                   state: state,
                   child: CustomersView(),
-                ),
-          ),
-          GoRoute(
-            path: '/reports',
-            name: 'reports',
-            pageBuilder:
-                (context, state) => buildPageWithDefaultTransition<void>(
-                  context: context,
-                  state: state,
-                  child: ReportsView(),
                 ),
           ),
           GoRoute(
