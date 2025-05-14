@@ -53,7 +53,7 @@ class ProfileViewModel extends ChangeNotifier {
             },
             (success) {
               if (success) {
-                Routers.goToNamed(context, 'home');
+                Routers.goToNamed(context, 'login');
               }
             },
           );

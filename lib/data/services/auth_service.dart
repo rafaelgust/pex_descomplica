@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../config/providers.dart';
 import '../models/auth/user_model.dart';
 import 'http_service.dart';
 import 'jwt/jwt_service.dart';
@@ -86,6 +87,10 @@ class AuthServiceImplPocketBase implements AuthService {
   @override
   Future<void> logout() async {
     await _storage.deleteItem('token');
+    await _storage.clear();
+    await _storage.deleteTokens();
+
+    await Providers.restart();
   }
 
   @override

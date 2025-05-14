@@ -353,7 +353,7 @@ class _NavRailPageState extends State<NavRailPage>
             title: const Text('Configurações'),
             selected: _homeViewModel.selectedIndex == 5,
             onTap: () {
-              _homeViewModel.onItemTapped(6);
+              _homeViewModel.onItemTapped(5);
               Routers.goToNamed(context, _homeViewModel.selectedViewName);
               Navigator.pop(context);
             },
@@ -364,7 +364,7 @@ class _NavRailPageState extends State<NavRailPage>
             title: const Text('Perfil'),
             selected: _homeViewModel.selectedIndex == 6,
             onTap: () {
-              _homeViewModel.onItemTapped(7);
+              _homeViewModel.onItemTapped(6);
               Routers.goToNamed(context, _homeViewModel.selectedViewName);
               Navigator.pop(context);
             },

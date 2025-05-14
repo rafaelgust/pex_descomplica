@@ -447,33 +447,12 @@ class _ProfileViewState extends State<ProfileView>
 
           const SizedBox(height: 32),
 
-          // Additional Security Options
           _buildSecurityOption(
-            icon: Icons.verified_user,
-            title: 'Verificação em duas etapas',
-            description:
-                'Aumente a segurança da sua conta com verificação adicional.',
+            icon: Icons.logout,
+            title: 'Desconectar',
+            description: 'Desconectar o usuário de todos os dispositivos',
             onTap: () {
-              // Implementar lógica de verificação em duas etapas
-            },
-          ),
-
-          _buildSecurityOption(
-            icon: Icons.devices,
-            title: 'Dispositivos conectados',
-            description: 'Gerencie os dispositivos conectados à sua conta.',
-            onTap: () {
-              // Implementar lógica de dispositivos conectados
-            },
-          ),
-
-          _buildSecurityOption(
-            icon: Icons.security,
-            title: 'Configurações avançadas de segurança',
-            description:
-                'Configure opções avançadas de segurança para sua conta.',
-            onTap: () {
-              // Implementar configurações avançadas de segurança
+              _viewModel.logout(context);
             },
           ),
         ],
