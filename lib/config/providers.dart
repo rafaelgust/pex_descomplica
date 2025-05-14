@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../data/repositories/auth/auth_repository.dart';
 import '../data/repositories/category/category_repository.dart';
 import '../data/repositories/customer/customer_repository.dart';
+import '../data/repositories/dashboard/dashboard_repository.dart';
 import '../data/repositories/invoice/invoice_repository.dart';
 import '../data/repositories/product/product_repository.dart';
 import '../data/repositories/stock/stock_repository.dart';
@@ -17,6 +18,7 @@ import '../data/services/pocket_base/pocket_base.dart';
 import '../data/services/storage/cookie_storage_service_imp.dart';
 import '../data/services/storage/secure_storage_storage_service_imp.dart';
 import '../data/services/storage/storage_service.dart';
+import '../ui/controllers/dashboard_controller.dart';
 import '../ui/view_models/customer_view_model.dart';
 import '../ui/view_models/home_view_model.dart';
 import '../ui/view_models/order_view_model.dart';
@@ -78,6 +80,15 @@ class Providers {
       () => InvoiceRepositoryImpl(pbService),
     );
 
+    injector.registerFactory<DashboardRepository>(
+      () => DashboardRepositoryImpl(injector.get<StorageService>()),
+    );
+
+    // ===== Controllers =====
+
+    injector.registerLazySingleton<DashboardController>(
+      () => DashboardController(injector.get<DashboardRepository>()),
+    );
     // ===== ViewModels =====
 
     injector.registerLazySingleton<HomeViewModel>(
