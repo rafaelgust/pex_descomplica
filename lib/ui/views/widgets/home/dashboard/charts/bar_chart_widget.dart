@@ -63,102 +63,90 @@ class BarChartWidgetState extends State<BarChartWidget> {
           margin: const EdgeInsets.all(16),
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Entradas vs Saídas Mensais',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 24),
-                AspectRatio(
-                  aspectRatio: 1.6,
-                  child: BarChart(
-                    BarChartData(
-                      maxY: _getMaxY() + 5,
-                      barTouchData: BarTouchData(
-                        touchTooltipData: BarTouchTooltipData(
-                          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                            final isEntrada = rodIndex == 0;
-                            final month = widget.data[group.x.toInt()].month;
-                            return BarTooltipItem(
-                              '$month\n${isEntrada ? "Entrada" : "Saída"}: ${rod.toY}',
-                              const TextStyle(color: Colors.white),
-                            );
-                          },
-                        ),
-                        touchCallback: (event, response) {
-                          if (response == null || response.spot == null) {
-                            setState(() {
-                              touchedGroupIndex = -1;
-                              showingBarGroups = List.of(rawBarGroups);
-                            });
-                            return;
-                          }
+            child: AspectRatio(
+              aspectRatio: 1.6,
+              child: BarChart(
+                BarChartData(
+                  maxY: _getMaxY() + 5,
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                        final isEntrada = rodIndex == 0;
+                        final month = widget.data[group.x.toInt()].month;
+                        return BarTooltipItem(
+                          '$month\n${isEntrada ? "Entrada" : "Saída"}: ${rod.toY}',
+                          const TextStyle(color: Colors.white),
+                        );
+                      },
+                    ),
+                    touchCallback: (event, response) {
+                      if (response == null || response.spot == null) {
+                        setState(() {
+                          touchedGroupIndex = -1;
+                          showingBarGroups = List.of(rawBarGroups);
+                        });
+                        return;
+                      }
 
-                          touchedGroupIndex =
-                              response.spot!.touchedBarGroupIndex;
+                      touchedGroupIndex = response.spot!.touchedBarGroupIndex;
 
-                          setState(() {
-                            if (!event.isInterestedForInteractions) {
-                              touchedGroupIndex = -1;
-                              showingBarGroups = List.of(rawBarGroups);
-                              return;
-                            }
-                            showingBarGroups = List.of(rawBarGroups);
-                            if (touchedGroupIndex != -1) {
-                              final group = showingBarGroups[touchedGroupIndex];
-                              final avg =
-                                  group.barRods
-                                      .map((e) => e.toY)
-                                      .reduce((a, b) => a + b) /
-                                  group.barRods.length;
+                      setState(() {
+                        if (!event.isInterestedForInteractions) {
+                          touchedGroupIndex = -1;
+                          showingBarGroups = List.of(rawBarGroups);
+                          return;
+                        }
+                        showingBarGroups = List.of(rawBarGroups);
+                        if (touchedGroupIndex != -1) {
+                          final group = showingBarGroups[touchedGroupIndex];
+                          final avg =
+                              group.barRods
+                                  .map((e) => e.toY)
+                                  .reduce((a, b) => a + b) /
+                              group.barRods.length;
 
-                              showingBarGroups[touchedGroupIndex] = group
-                                  .copyWith(
-                                    barRods:
-                                        group.barRods.map((e) {
-                                          return e.copyWith(
-                                            toY: avg,
-                                            color: widget.avgColor,
-                                          );
-                                        }).toList(),
+                          showingBarGroups[touchedGroupIndex] = group.copyWith(
+                            barRods:
+                                group.barRods.map((e) {
+                                  return e.copyWith(
+                                    toY: avg,
+                                    color: widget.avgColor,
                                   );
-                            }
-                          });
-                        },
+                                }).toList(),
+                          );
+                        }
+                      });
+                    },
+                  ),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 36,
+                        getTitlesWidget: bottomTitles,
                       ),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            reservedSize: 36,
-                            getTitlesWidget: bottomTitles,
-                          ),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: _getLeftTitleInterval(),
-                            reservedSize: 40,
-                            getTitlesWidget: leftTitles,
-                          ),
-                        ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: _getLeftTitleInterval(),
+                        reservedSize: 40,
+                        getTitlesWidget: leftTitles,
                       ),
-                      borderData: FlBorderData(show: false),
-                      barGroups: showingBarGroups,
-                      gridData: FlGridData(show: false),
                     ),
                   ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: showingBarGroups,
+                  gridData: FlGridData(show: false),
                 ),
-              ],
+              ),
             ),
           ),
         ),
