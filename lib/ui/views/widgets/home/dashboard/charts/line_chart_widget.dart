@@ -140,7 +140,8 @@ class _LineChartWidgetState extends State<LineChartWidget> {
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors: gradientColors.map((c) => c.withOpacity(0.3)).toList(),
+              colors:
+                  gradientColors.map((c) => c..withValues(alpha: 0.3)).toList(),
             ),
           ),
         ),
@@ -165,8 +166,8 @@ class _LineChartWidgetState extends State<LineChartWidget> {
           isCurved: true,
           gradient: LinearGradient(
             colors: [
-              gradientColors[0].withOpacity(0.5),
-              gradientColors[1].withOpacity(0.5),
+              gradientColors[0]..withValues(alpha: 0.5),
+              gradientColors[1]..withValues(alpha: 0.5),
             ],
           ),
           barWidth: 4,

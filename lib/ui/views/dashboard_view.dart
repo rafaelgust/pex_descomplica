@@ -3,7 +3,6 @@ import '../responsive_helper.dart';
 import 'widgets/home/dashboard/charts/bar_chart_widget.dart';
 import 'widgets/home/dashboard/charts/line_chart_widget.dart';
 import 'widgets/home/dashboard/charts/pie_chart_widget.dart';
-import 'widgets/home/dashboard/infor_card.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
