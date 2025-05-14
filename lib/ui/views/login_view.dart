@@ -141,6 +141,7 @@ class _LoginViewState extends State<LoginView> {
                   hintText: 'Digite seu email',
                   prefixIcon: Icons.email_outlined,
                   obscureText: false,
+                  autofillHints: const [AutofillHints.username],
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (_) {
                     // Limpar mensagem de erro quando o usuário começar a digitar
@@ -157,6 +158,7 @@ class _LoginViewState extends State<LoginView> {
                   labelText: 'Senha',
                   hintText: 'Digite sua senha',
                   prefixIcon: Icons.lock_outline,
+                  autofillHints: [AutofillHints.password],
                   obscureText: _obscureText,
                   onChanged: (_) {
                     // Limpar mensagem de erro quando o usuário começar a digitar

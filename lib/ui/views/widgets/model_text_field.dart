@@ -8,6 +8,7 @@ class ModelTextField extends StatelessWidget {
   final bool obscureText;
   final Widget? suffixIcon;
   final TextInputType keyboardType;
+  final Iterable<String>? autofillHints;
   final Function(String)? onChanged;
   final Function(Object)? onFieldSubmitted;
 
@@ -18,6 +19,7 @@ class ModelTextField extends StatelessWidget {
     required this.hintText,
     required this.prefixIcon,
     required this.obscureText,
+    this.autofillHints,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
     this.onChanged,
@@ -27,6 +29,7 @@ class ModelTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      autofillHints: autofillHints,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
