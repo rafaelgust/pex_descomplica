@@ -1,14 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:pex_descomplica/ui/controllers/product_controller.dart';
 
 import '../../data/models/dashboard/info_card_model.dart';
 import '../../data/repositories/dashboard/dashboard_repository.dart';
 
 class DashboardController extends ChangeNotifier {
   final DashboardRepository repository;
+  final ProductController productController;
 
-  DashboardController(this.repository);
+  DashboardController(this.repository, this.productController);
 
   final ValueNotifier<List<InfoCardModel>> infoCards = ValueNotifier([]);
   bool isLoading = false;
@@ -80,7 +82,7 @@ class DashboardController extends ChangeNotifier {
     try {
       infoCards.value.clear();
 
-      await updateStockAmount('1.587', 'R\$ 145.782,50');
+      await updateStockAmount();
       await updateDebts('23', 'R\$ 1.587,00');
       await updatePendingOrders('7', 'R\$ 1.587,00');
       await updateMonthlyRevenue('Mai/2025', 'R\$ 28.450,75');
@@ -128,11 +130,12 @@ class DashboardController extends ChangeNotifier {
   }
 
   // InfoCard Basic
-  Future<void> updateStockAmount(String amount, String value) async {
+  Future<void> updateStockAmount() async {
+    final quantity = await productController.getAmountProductsInStock();
     final card = InfoCardModel(
       title: 'Total de Produtos em Estoque',
-      info: amount,
-      value: value,
+      info: quantity.toString(),
+      value: '',
       type: 'itens',
       icon: Icons.inventory_2,
       color: const Color(0xFF3182CE),
