@@ -49,6 +49,9 @@ abstract class ProductRepository {
   });
 
   Future<Either<ProductFailure, bool>> deleteItem({required String id});
+
+  //products_quantity
+  Future<Either<ProductFailure, int>> getSumProductsQuantity();
 }
 
 class ProductRepositoryImpl implements ProductRepository {
@@ -308,6 +311,26 @@ class ProductRepositoryImpl implements ProductRepository {
       return products.when(
         success: (successResponse) async {
           return Right(successResponse.totalItems.toInt());
+        },
+        error: (errorResponse) {
+          return const Left(ProductSearchFailure('No products found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<ProductFailure, int>> getSumProductsQuantity() async {
+    try {
+      final products = await _pocketBase.getOne(
+        collection: 'products_quantity_sum',
+        id: 'sum',
+      );
+      return products.when(
+        success: (successResponse) async {
+          return Right(successResponse.items.first['total_quantity'].toInt());
         },
         error: (errorResponse) {
           return const Left(ProductSearchFailure('No products found'));
