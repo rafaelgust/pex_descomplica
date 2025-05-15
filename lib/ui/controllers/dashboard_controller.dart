@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../data/models/dashboard/info_card_model.dart';
+import '../../data/models/invoice/invoices_monthly_model.dart';
 import '../../data/repositories/dashboard/dashboard_repository.dart';
 import '../../data/services/internationalization/intl_service.dart';
 import 'invoice_controller.dart';
@@ -20,6 +21,8 @@ class DashboardController extends ChangeNotifier {
   );
 
   final ValueNotifier<List<InfoCardModel>> infoCards = ValueNotifier([]);
+  final ValueNotifier<List<InvoicesMonthlyModel>> invoicesMonthly =
+      ValueNotifier<List<InvoicesMonthlyModel>>([]);
   bool isLoading = false;
 
   Future<void> init() async {
@@ -92,7 +95,7 @@ class DashboardController extends ChangeNotifier {
       await updateStockAmount();
       await updateDebts();
       await updatePendingOrders();
-      await updateMonthlyRevenue('Mai/2025', 'R\$ 28.450,75');
+      await updateMonthlyRevenue();
 
       await getInfoCards();
     } catch (e) {
@@ -173,12 +176,37 @@ class DashboardController extends ChangeNotifier {
     await _createInfoCard(card, 'PendingOrders');
   }
 
-  Future<void> updateMonthlyRevenue(String month, String value) async {
+  Future<void> updateMonthlyRevenue() async {
+    final dateNow = DateTime.now();
+
+    final monthNumber = dateNow.month;
+    final monthName = monthToString(monthNumber);
+    final yearNumber = dateNow.year;
+
+    final result = await invoiceController.getMontlyRevenue();
+
+    invoicesMonthly.value = result;
+
+    final monthRevenue = result.firstWhere(
+      (item) => item.month == monthNumber && item.year == yearNumber,
+      orElse:
+          () => InvoicesMonthlyModel(
+            year: yearNumber,
+            month: monthNumber,
+            totalMovements: 0,
+            totalQuantity: 0,
+            totalValue: 0,
+          ),
+    );
+
     final card = InfoCardModel(
       title: 'Faturamento Mensal',
-      info: month,
-      value: value,
-      type: '',
+      info: '$monthName/$yearNumber',
+      value: formatCurrency(monthRevenue.totalValue),
+      type:
+          monthRevenue.totalMovements == 1
+              ? '${monthRevenue.totalMovements} saída'
+              : '${monthRevenue.totalMovements} saídas',
       icon: Icons.attach_money,
       color: const Color(0xFF6B46C1),
     );

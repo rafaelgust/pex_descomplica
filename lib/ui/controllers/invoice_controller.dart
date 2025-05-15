@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/invoice/invoices_monthly_model.dart';
 import '../../data/repositories/invoice/invoice_repository.dart';
 
 class InvoiceController extends ChangeNotifier {
@@ -44,6 +45,25 @@ class InvoiceController extends ChangeNotifier {
       );
     } catch (e) {
       return data;
+    }
+  }
+
+  Future<List<InvoicesMonthlyModel>> getMontlyRevenue() async {
+    List<InvoicesMonthlyModel> data = [];
+
+    try {
+      final result = await repository.getInvoicesMonthly();
+      return result.fold(
+        (error) {
+          return data;
+        },
+        (total) {
+          data.addAll(total);
+          return data;
+        },
+      );
+    } catch (e) {
+      rethrow;
     }
   }
 }

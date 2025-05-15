@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 
+import '../../models/invoice/invoices_monthly_model.dart';
 import '../../models/invoice_model.dart';
 import '../../services/pocket_base/pocket_base.dart';
 import 'invoice_failure.dart';
@@ -44,6 +45,9 @@ abstract class InvoiceRepository {
   getSumSuppliersPendingInvoices();
   Future<Either<InvoiceFailure, Map<String, dynamic>>>
   getSumCustomersPendingInvoices();
+
+  Future<Either<InvoiceFailure, List<InvoicesMonthlyModel>>>
+  getInvoicesMonthly();
 }
 
 class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -288,6 +292,32 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
       return products.when(
         success: (successResponse) async {
           Map<String, dynamic> data = successResponse.items.first;
+          return Right(data);
+        },
+        error: (errorResponse) {
+          return const Left(InvoiceSearchFailure('No invoices found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<InvoiceFailure, List<InvoicesMonthlyModel>>>
+  getInvoicesMonthly() async {
+    try {
+      final products = await _pocketBase.getList(
+        collection: 'monthly_invoices_outputs',
+        fields: 'year, month, totalMovements, totalQuantity, totalValue',
+      );
+      return products.when(
+        success: (successResponse) async {
+          List<InvoicesMonthlyModel> data =
+              successResponse.items
+                  .map((item) => InvoicesMonthlyModel.fromJson(item))
+                  .toList();
+
           return Right(data);
         },
         error: (errorResponse) {
