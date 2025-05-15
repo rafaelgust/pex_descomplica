@@ -11,3 +11,15 @@ String formatCurrency(int valueInCents) {
 
   return formatter.format(valueInReais);
 }
+
+String formatDate(DateTime date) {
+  final formatter = DateFormat('dd/MM/yyyy');
+  return formatter.format(date);
+}
+
+String monthToString(int month) {
+  final formatter = DateFormat('MMMM', 'pt_BR');
+
+  final monthName = formatter.format(DateTime(0, month));
+  return monthName[0].toUpperCase() + monthName.substring(1);
+}
