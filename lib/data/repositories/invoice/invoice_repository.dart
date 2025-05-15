@@ -39,6 +39,11 @@ abstract class InvoiceRepository {
   });
 
   Future<Either<InvoiceFailure, bool>> deleteItem({required String id});
+
+  Future<Either<InvoiceFailure, Map<String, dynamic>>>
+  getSumSuppliersPendingInvoices();
+  Future<Either<InvoiceFailure, Map<String, dynamic>>>
+  getSumCustomersPendingInvoices();
 }
 
 class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -243,6 +248,50 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
         },
         error: (errorResponse) {
           return const Left(InvoiceSearchFailure('No invoice found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<InvoiceFailure, Map<String, dynamic>>>
+  getSumSuppliersPendingInvoices() async {
+    try {
+      final products = await _pocketBase.getOne(
+        collection: 'suppliers_pending_invoices',
+        id: 'sum',
+      );
+      return products.when(
+        success: (successResponse) async {
+          Map<String, dynamic> data = successResponse.items.first;
+          return Right(data);
+        },
+        error: (errorResponse) {
+          return const Left(InvoiceSearchFailure('No invoices found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<InvoiceFailure, Map<String, dynamic>>>
+  getSumCustomersPendingInvoices() async {
+    try {
+      final products = await _pocketBase.getOne(
+        collection: 'customers_pending_invoices',
+        id: 'sum',
+      );
+      return products.when(
+        success: (successResponse) async {
+          Map<String, dynamic> data = successResponse.items.first;
+          return Right(data);
+        },
+        error: (errorResponse) {
+          return const Left(InvoiceSearchFailure('No invoices found'));
         },
       );
     } catch (e) {
