@@ -19,6 +19,7 @@ import '../data/services/storage/cookie_storage_service_imp.dart';
 import '../data/services/storage/secure_storage_storage_service_imp.dart';
 import '../data/services/storage/storage_service.dart';
 import '../ui/controllers/dashboard_controller.dart';
+import '../ui/controllers/invoice_controller.dart';
 import '../ui/controllers/product_controller.dart';
 import '../ui/view_models/customer_view_model.dart';
 import '../ui/view_models/home_view_model.dart';
@@ -91,10 +92,15 @@ class Providers {
       () => ProductController(injector.get<ProductRepository>()),
     );
 
+    injector.registerLazySingleton<InvoiceController>(
+      () => InvoiceController(injector.get<InvoiceRepository>()),
+    );
+
     injector.registerLazySingleton<DashboardController>(
       () => DashboardController(
         injector.get<DashboardRepository>(),
         injector.get<ProductController>(),
+        injector.get<InvoiceController>(),
       ),
     );
     // ===== ViewModels =====

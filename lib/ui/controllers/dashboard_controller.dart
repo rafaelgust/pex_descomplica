@@ -1,16 +1,23 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:pex_descomplica/ui/controllers/product_controller.dart';
 
 import '../../data/models/dashboard/info_card_model.dart';
 import '../../data/repositories/dashboard/dashboard_repository.dart';
+import '../../data/services/internationalization/intl_service.dart';
+import 'invoice_controller.dart';
+import 'product_controller.dart';
 
 class DashboardController extends ChangeNotifier {
   final DashboardRepository repository;
   final ProductController productController;
+  final InvoiceController invoiceController;
 
-  DashboardController(this.repository, this.productController);
+  DashboardController(
+    this.repository,
+    this.productController,
+    this.invoiceController,
+  );
 
   final ValueNotifier<List<InfoCardModel>> infoCards = ValueNotifier([]);
   bool isLoading = false;
@@ -83,8 +90,8 @@ class DashboardController extends ChangeNotifier {
       infoCards.value.clear();
 
       await updateStockAmount();
-      await updateDebts('23', 'R\$ 1.587,00');
-      await updatePendingOrders('7', 'R\$ 1.587,00');
+      await updateDebts();
+      await updatePendingOrders();
       await updateMonthlyRevenue('Mai/2025', 'R\$ 28.450,75');
 
       await getInfoCards();
@@ -144,11 +151,14 @@ class DashboardController extends ChangeNotifier {
     await _createInfoCard(card, 'StockAmount');
   }
 
-  Future<void> updateDebts(String amount, String value) async {
+  Future<void> updateDebts() async {
+    final result =
+        await invoiceController.getAmountSuppliersWithPaymentPending();
+
     final card = InfoCardModel(
       title: 'Débitos com Fornecedores',
-      info: amount,
-      value: value,
+      info: result['amount'].toString(),
+      value: formatCurrency(result['value'].toInt()),
       type: 'pendências',
       icon: Icons.warning_amber,
       color: const Color(0xFFDD6B20),
@@ -157,11 +167,14 @@ class DashboardController extends ChangeNotifier {
     await _createInfoCard(card, 'Debts');
   }
 
-  Future<void> updatePendingOrders(String amount, String value) async {
+  Future<void> updatePendingOrders() async {
+    final result =
+        await invoiceController.getAmountCustomersWithPaymentPending();
+
     final card = InfoCardModel(
       title: 'Vendas Pendentes',
-      info: amount,
-      value: value,
+      info: result['amount'].toString(),
+      value: formatCurrency(result['value'].toInt()),
       type: 'pedidos',
       icon: Icons.shopping_cart,
       color: const Color(0xFF2F855A),
