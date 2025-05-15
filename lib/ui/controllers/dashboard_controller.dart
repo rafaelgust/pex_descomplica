@@ -107,14 +107,9 @@ class DashboardController extends ChangeNotifier {
 
       final result = await repository.createItem(key: id, value: jsonString);
 
-      result.fold(
-        (failure) {
-          debugPrint('Error creating info card: $failure');
-        },
-        (success) {
-          debugPrint('Info card $id created successfully');
-        },
-      );
+      result.fold((failure) {
+        debugPrint('Error creating info card: $failure');
+      }, (success) {});
     } catch (e) {
       debugPrint('Unexpected error creating info card: $e');
     }
@@ -123,14 +118,9 @@ class DashboardController extends ChangeNotifier {
   Future<void> _deleteInfoCard(String id) async {
     try {
       final result = await repository.deleteItem(id: id);
-      result.fold(
-        (failure) {
-          debugPrint('Error deleting info card: $failure');
-        },
-        (success) {
-          debugPrint('Info card $id deleted successfully');
-        },
-      );
+      result.fold((failure) {
+        debugPrint('Error deleting info card: $failure');
+      }, (success) {});
     } catch (e) {
       debugPrint('Unexpected error deleting info card: $e');
     }
@@ -159,7 +149,7 @@ class DashboardController extends ChangeNotifier {
       title: 'Débitos com Fornecedores',
       info: result['amount'].toString(),
       value: formatCurrency(result['value'].toInt()),
-      type: 'pendências',
+      type: result['amount'].toInt() == 1 ? 'pendência' : 'pendências',
       icon: Icons.warning_amber,
       color: const Color(0xFFDD6B20),
     );
@@ -175,7 +165,7 @@ class DashboardController extends ChangeNotifier {
       title: 'Vendas Pendentes',
       info: result['amount'].toString(),
       value: formatCurrency(result['value'].toInt()),
-      type: 'pedidos',
+      type: result['amount'].toInt() == 1 ? 'venda' : 'vendas',
       icon: Icons.shopping_cart,
       color: const Color(0xFF2F855A),
     );
