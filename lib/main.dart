@@ -5,11 +5,13 @@ import 'config/providers.dart';
 import 'config/routers.dart';
 import 'data/services/injector/injector_service.dart';
 import 'data/services/pocket_base/pocket_base.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  initializeDateFormatting();
 
   await _configureApp();
 
@@ -50,6 +52,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: appRouter(),
+      locale: const Locale('pt', 'BR'),
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.orange),
       debugShowCheckedModeBanner: false,
     );
