@@ -12,7 +12,6 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView>
     with SingleTickerProviderStateMixin {
   final ProfileViewModel _viewModel = ProfileViewModel();
-  late TabController _tabController;
 
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -25,13 +24,11 @@ class _ProfileViewState extends State<ProfileView>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _viewModel.loadUserData();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
     _confirmPasswordController.dispose();
@@ -42,11 +39,6 @@ class _ProfileViewState extends State<ProfileView>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Perfil do Usuário'),
-        centerTitle: true,
-        elevation: 0,
-      ),
       body: AnimatedBuilder(
         animation: _viewModel,
         builder: (context, child) {
@@ -90,45 +82,227 @@ class _ProfileViewState extends State<ProfileView>
             );
           }
 
-          return Column(
-            children: [
-              // Profile Header
-              _buildProfileHeader(userData),
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView(
+              children: [
+                _buildProfileHeader(userData),
+                const SizedBox(height: 24),
+                Center(
+                  child: SizedBox(
+                    width: 500,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.shield,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Segurança da Conta',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
 
-              // Tab Bar
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
+                        Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Alterar Senha',
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 16),
+
+                                TextField(
+                                  controller: _currentPasswordController,
+                                  obscureText: _obscureCurrentPassword,
+                                  decoration: InputDecoration(
+                                    labelText: 'Senha Atual',
+                                    prefixIcon: const Icon(Icons.lock_outline),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscureCurrentPassword
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureCurrentPassword =
+                                              !_obscureCurrentPassword;
+                                        });
+                                      },
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                TextField(
+                                  controller: _newPasswordController,
+                                  obscureText: _obscureNewPassword,
+                                  decoration: InputDecoration(
+                                    labelText: 'Nova Senha',
+                                    prefixIcon: const Icon(
+                                      Icons.vpn_key_outlined,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscureNewPassword
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureNewPassword =
+                                              !_obscureNewPassword;
+                                        });
+                                      },
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+
+                                TextField(
+                                  controller: _confirmPasswordController,
+                                  obscureText: _obscureConfirmPassword,
+                                  decoration: InputDecoration(
+                                    labelText: 'Confirmar Nova Senha',
+                                    prefixIcon: const Icon(
+                                      Icons.check_circle_outline,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscureConfirmPassword
+                                            ? Icons.visibility
+                                            : Icons.visibility_off,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscureConfirmPassword =
+                                              !_obscureConfirmPassword;
+                                        });
+                                      },
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      _showPasswordUpdateConfirmation();
+                                    },
+                                    icon: const Icon(Icons.lock_reset),
+                                    label: const Text('Atualizar Senha'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: InkWell(
+                            onTap: () {
+                              _viewModel.logout(context);
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.logout,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'Desconectar',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-                child: TabBar(
-                  controller: _tabController,
-                  labelColor: Theme.of(context).colorScheme.primary,
-                  unselectedLabelColor: Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withValues(alpha: 0.7),
-                  indicatorColor: Theme.of(context).colorScheme.primary,
-                  tabs: const [
-                    Tab(icon: Icon(Icons.history), text: "Atividades"),
-                    Tab(icon: Icon(Icons.lock), text: "Segurança"),
-                  ],
-                ),
-              ),
-
-              // Tab Content
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [_buildActivitiesTab(), _buildSecurityTab()],
-                ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
@@ -295,391 +469,6 @@ class _ProfileViewState extends State<ProfileView>
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildSecurityTab() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Security header
-          Row(
-            children: [
-              Icon(Icons.shield, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(width: 8),
-              Text(
-                'Segurança da Conta',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Password Change Card
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(
-                color: Theme.of(
-                  context,
-                ).colorScheme.outline.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Alterar Senha',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Current Password Field
-                  TextField(
-                    controller: _currentPasswordController,
-                    obscureText: _obscureCurrentPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Senha Atual',
-                      prefixIcon: const Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureCurrentPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureCurrentPassword = !_obscureCurrentPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // New Password Field
-                  TextField(
-                    controller: _newPasswordController,
-                    obscureText: _obscureNewPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Nova Senha',
-                      prefixIcon: const Icon(Icons.vpn_key_outlined),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureNewPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureNewPassword = !_obscureNewPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Confirm Password Field
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmar Nova Senha',
-                      prefixIcon: const Icon(Icons.check_circle_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Update Password Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      onPressed: () {
-                        // TODO: Implementar lógica de alteração de senha
-                        _showPasswordUpdateConfirmation();
-                      },
-                      icon: const Icon(Icons.lock_reset),
-                      label: const Text('Atualizar Senha'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          _buildSecurityOption(
-            icon: Icons.logout,
-            title: 'Desconectar',
-            description: 'Desconectar o usuário de todos os dispositivos',
-            onTap: () {
-              _viewModel.logout(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSecurityOption({
-    required IconData icon,
-    required String title,
-    required String description,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-        ),
-      ),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: Theme.of(context).colorScheme.primary),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Text(
-                      description,
-                      style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Icons.chevron_right,
-                color: Theme.of(
-                  context,
-                ).colorScheme.onSurface.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActivitiesTab() {
-    return Column(
-      children: [
-        // Filter bar
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 3,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.filter_list, size: 18),
-              const SizedBox(width: 8),
-              const Text('Filtrar por:'),
-              const SizedBox(width: 8),
-              DropdownButton<String>(
-                value: 'Todos',
-                underline: Container(),
-                items:
-                    <String>[
-                      'Todos',
-                      'Login',
-                      'Alterações',
-                      'Solicitações',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                onChanged: (String? newValue) {
-                  // TODO: Implementar filtro
-                },
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.calendar_today, size: 18),
-                onPressed: () {
-                  // TODO: Implementar filtro por data
-                },
-                tooltip: 'Filtrar por data',
-              ),
-            ],
-          ),
-        ),
-
-        // Activity list
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: 30,
-            itemBuilder: (context, index) {
-              // Exemplos de atividades
-              final activities = [
-                {
-                  'icon': Icons.login,
-                  'title': 'Login realizado',
-                  'description': 'Login bem-sucedido via navegador Chrome',
-                  'time': '10:30',
-                  'day': 'Hoje',
-                  'color': Colors.blue,
-                },
-                {
-                  'icon': Icons.person,
-                  'title': 'Perfil atualizado',
-                  'description': 'Informações pessoais atualizadas',
-                  'time': '15:45',
-                  'day': 'Ontem',
-                  'color': Colors.green,
-                },
-                {
-                  'icon': Icons.security,
-                  'title': 'Senha alterada',
-                  'description': 'Sua senha foi alterada com sucesso',
-                  'time': '09:15',
-                  'day': '02/05/2025',
-                  'color': Colors.orange,
-                },
-                {
-                  'icon': Icons.device_unknown,
-                  'title': 'Novo dispositivo',
-                  'description': 'Acesso de um novo dispositivo iOS',
-                  'time': '18:22',
-                  'day': '30/04/2025',
-                  'color': Colors.purple,
-                },
-              ];
-
-              final activityIndex = index % activities.length;
-              final activity = activities[activityIndex];
-
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: (activity['color'] as Color).withValues(
-                        alpha: 0.1,
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      activity['icon'] as IconData,
-                      color: activity['color'] as Color,
-                      size: 20,
-                    ),
-                  ),
-                  title: Text(activity['title'] as String),
-                  subtitle: Text(activity['description'] as String),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        activity['time'] as String,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      Text(
-                        activity['day'] as String,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    // TODO: Mostrar detalhes da atividade
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
