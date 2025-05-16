@@ -83,6 +83,13 @@ GoRouter appRouter() {
               state: state,
               child: NavRailPage(child: child),
             ),
+        redirect: (context, state) async {
+          final isLoggedIn = await authService.isAuthenticated();
+          if (!isLoggedIn) {
+            return '/login';
+          }
+          return null;
+        },
         routes: [
           GoRoute(
             path: '/home',
@@ -93,13 +100,6 @@ GoRouter appRouter() {
                   state: state,
                   child: DashboardView(),
                 ),
-            redirect: (context, state) async {
-              final isLoggedIn = await authService.isAuthenticated();
-              if (!isLoggedIn) {
-                return '/login';
-              }
-              return null;
-            },
           ),
           GoRoute(
             path: '/stock',

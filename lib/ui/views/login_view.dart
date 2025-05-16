@@ -41,33 +41,31 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            width: _responsiveHelper.getContainerWidth(context),
-            padding: _responsiveHelper.getPadding(context),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                ),
-              ],
-            ),
+        child: Container(
+          width: _responsiveHelper.getContainerWidth(context),
+          padding: _responsiveHelper.getPadding(context),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo ou ícone da empresa
                 Icon(
                   Icons.inventory_2_rounded,
                   size: _responsiveHelper.getIconSize(context),
                   color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(height: 24),
-                // APP NAME
                 Text(
                   Constants.appName,
                   textAlign: TextAlign.center,
@@ -95,7 +93,6 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 24),
 
-                // Mensagem de erro (se houver)
                 ValueListenableBuilder<String?>(
                   valueListenable: viewModel.errorMessage,
                   builder: (context, errorMessage, child) {
@@ -134,7 +131,6 @@ class _LoginViewState extends State<LoginView> {
                   },
                 ),
 
-                // Campo de email/usuário
                 ModelTextField(
                   controller: viewModel.emailController,
                   labelText: 'Email',
@@ -144,7 +140,6 @@ class _LoginViewState extends State<LoginView> {
                   autofillHints: const [AutofillHints.username],
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (_) {
-                    // Limpar mensagem de erro quando o usuário começar a digitar
                     if (viewModel.errorMessage.value != null) {
                       viewModel.errorMessage.value = null;
                     }
@@ -161,7 +156,6 @@ class _LoginViewState extends State<LoginView> {
                   autofillHints: [AutofillHints.password],
                   obscureText: _obscureText,
                   onChanged: (_) {
-                    // Limpar mensagem de erro quando o usuário começar a digitar
                     if (viewModel.errorMessage.value != null) {
                       viewModel.errorMessage.value = null;
                     }
@@ -183,25 +177,8 @@ class _LoginViewState extends State<LoginView> {
                   },
                 ),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      viewModel.navigateToForgotPassword(context);
-                    },
-                    child: Text(
-                      'Esqueceu a senha?',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-
                 const SizedBox(height: 32),
 
-                // Botão de login
                 ValueListenableBuilder<bool>(
                   valueListenable: viewModel.isLoading,
                   builder: (context, isLoading, child) {
@@ -215,27 +192,6 @@ class _LoginViewState extends State<LoginView> {
 
                 const SizedBox(height: 24),
 
-                // Opção para cadastro
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Não tem uma conta?',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        viewModel.navigateToSignUp(context);
-                      },
-                      child: const Text(
-                        'Cadastre-se',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Informação adicional
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -245,7 +201,6 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     TextButton(
                       onPressed: () {
-                        // Exibir diálogo de suporte
                         _showSupportDialog(context);
                       },
                       child: const Text(
@@ -283,7 +238,7 @@ class _LoginViewState extends State<LoginView> {
                     const Icon(Icons.email, size: 20, color: Colors.blue),
                     const SizedBox(width: 8),
                     Text(
-                      'suporte@pexestoque.com.br',
+                      'suporte@email.com.br',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontWeight: FontWeight.w500,
@@ -297,21 +252,7 @@ class _LoginViewState extends State<LoginView> {
                     const Icon(Icons.phone, size: 20, color: Colors.blue),
                     const SizedBox(width: 8),
                     Text(
-                      '(11) 4321-1234',
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.access_time, size: 20, color: Colors.blue),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Seg - Sex: 9h às 18h',
+                      '(XX) XXXXXX-XXXX',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontWeight: FontWeight.w500,
