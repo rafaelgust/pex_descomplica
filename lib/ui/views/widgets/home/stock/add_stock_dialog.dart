@@ -38,6 +38,7 @@ class _AddStockDialogState extends State<AddStockDialog> {
   bool _isSubmitting = false;
 
   int? _priceInCents;
+  late final FocusNode _supplierFocusNode;
 
   @override
   void initState() {
@@ -45,6 +46,18 @@ class _AddStockDialogState extends State<AddStockDialog> {
     _supplierViewModel.searchSuppliers();
     // Preencher o preço com o valor atual do produto
     _priceController.text = "";
+
+    _supplierFocusNode = FocusNode();
+
+    _supplierFocusNode.addListener(() {
+      if (_supplierFocusNode.hasFocus && _supplierController.text.isEmpty) {
+        // Força uma atualização do campo para mostrar as opções
+        _supplierController.text = ' ';
+        Future.delayed(Duration(milliseconds: 1), () {
+          _supplierController.text = '';
+        });
+      }
+    });
   }
 
   @override
@@ -54,6 +67,7 @@ class _AddStockDialogState extends State<AddStockDialog> {
     _noteController.dispose();
     _supplierController.dispose();
     _invoiceNumberController.dispose();
+    _supplierFocusNode.dispose();
     super.dispose();
   }
 
@@ -440,10 +454,10 @@ class _AddStockDialogState extends State<AddStockDialog> {
                       // Fornecedor
                       RawAutocomplete<SupplierModel>(
                         textEditingController: _supplierController,
-                        focusNode: FocusNode(),
+                        focusNode: _supplierFocusNode,
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text == '') {
-                            return const Iterable<SupplierModel>.empty();
+                            return _supplierViewModel.suppliers;
                           }
                           return _supplierViewModel.suppliers.where((
                             SupplierModel option,

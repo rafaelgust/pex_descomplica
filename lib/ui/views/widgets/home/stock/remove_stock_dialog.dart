@@ -50,6 +50,7 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
   ];
 
   int? _priceInCents;
+  late final FocusNode _customerFocusNode;
 
   @override
   void initState() {
@@ -57,6 +58,17 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
     _customerViewModel.searchCustomers();
     // Preencher o preço com o valor atual do produto
     _priceController.text = "";
+
+    _customerFocusNode = FocusNode();
+
+    _customerFocusNode.addListener(() {
+      if (_customerFocusNode.hasFocus && _customerController.text.isEmpty) {
+        _customerController.text = ' ';
+        Future.delayed(Duration(milliseconds: 1), () {
+          _customerController.text = '';
+        });
+      }
+    });
   }
 
   @override
@@ -67,6 +79,7 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
     _customerController.dispose();
     _invoiceNumberController.dispose();
     _priceController.dispose();
+    _customerFocusNode.dispose();
     super.dispose();
   }
 
@@ -492,10 +505,10 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
                       // Cliente
                       RawAutocomplete<CustomerModel>(
                         textEditingController: _customerController,
-                        focusNode: FocusNode(),
+                        focusNode: _customerFocusNode,
                         optionsBuilder: (TextEditingValue textEditingValue) {
                           if (textEditingValue.text == '') {
-                            return const Iterable<CustomerModel>.empty();
+                            return _customerViewModel.customers;
                           }
                           return _customerViewModel.customers.where((
                             CustomerModel option,
