@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/models/dashboard/info_card_model.dart';
 import '../../data/services/injector/injector_service.dart';
 import '../controllers/dashboard_controller.dart';
-import '../responsive_helper.dart';
 
 import 'widgets/home/dashboard/desktop_charts.dart';
 import 'widgets/home/dashboard/infor_card.dart';
@@ -50,7 +49,6 @@ class _DashboardViewState extends State<DashboardView> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final responsive = ResponsiveHelper();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
@@ -128,7 +126,7 @@ class _DashboardViewState extends State<DashboardView> {
                         const SizedBox(height: 40),
                         const Divider(height: 1),
                         const SizedBox(height: 40),
-                        responsive.isMobile(context)
+                        MediaQuery.of(context).size.width < 1200
                             ? MobileCharts(controller: _controller)
                             : DesktopCharts(controller: _controller),
                         const SizedBox(height: 32),

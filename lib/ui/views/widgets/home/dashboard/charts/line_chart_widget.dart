@@ -94,7 +94,7 @@ class _LineChartWidgetState extends State<LineChartWidget> {
         ),
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
-            interval: 1000,
+            interval: 2000,
             showTitles: true,
             reservedSize: 60,
             getTitlesWidget: (value, meta) {
@@ -138,16 +138,15 @@ class _LineChartWidgetState extends State<LineChartWidget> {
         LineChartBarData(
           spots: spots,
           isCurved: true,
+          curveSmoothness: 0.5, // Ajuste este valor para mudar a suavidade
           gradient: LinearGradient(colors: gradientColors),
           barWidth: 1,
           isStrokeCapRound: true,
           dotData: const FlDotData(show: true),
-
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
-              colors:
-                  gradientColors.map((c) => c.withValues(alpha: 0.3)).toList(),
+              colors: gradientColors.map((c) => c.withOpacity(0.3)).toList(),
             ),
           ),
         ),
@@ -170,9 +169,9 @@ class _LineChartWidgetState extends State<LineChartWidget> {
         LineChartBarData(
           spots: spots,
           isCurved: true,
+          curveSmoothness: 0.5, // Ajuste este valor para mudar a suavidade
           gradient: LinearGradient(
-            colors:
-                gradientColors.map((c) => c.withValues(alpha: 0.5)).toList(),
+            colors: gradientColors.map((c) => c.withOpacity(0.5)).toList(),
           ),
           barWidth: 4,
           isStrokeCapRound: true,
