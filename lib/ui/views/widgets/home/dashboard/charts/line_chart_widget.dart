@@ -1,8 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../../../../../data/models/invoice/invoices_monthly_model.dart';
+import '../../../../../../data/services/internationalization/intl_service.dart';
 
 class LineChartWidget extends StatefulWidget {
-  final List<Map<String, dynamic>> data;
+  final List<InvoicesMonthlyModel> data;
 
   const LineChartWidget({super.key, required this.data});
 
@@ -29,26 +33,10 @@ class _LineChartWidgetState extends State<LineChartWidget> {
           ),
           color: const Color.fromARGB(255, 55, 48, 35),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      'Gráfico de Vendas Mensais',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelMedium?.copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
-                AspectRatio(
-                  aspectRatio: 1.70,
-                  child: LineChart(showAvg ? avgData() : mainData()),
-                ),
-              ],
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+            child: AspectRatio(
+              aspectRatio: 1.70,
+              child: LineChart(showAvg ? avgData() : mainData()),
             ),
           ),
         ),
@@ -61,11 +49,18 @@ class _LineChartWidgetState extends State<LineChartWidget> {
     final labels = <String>[];
 
     for (var i = 0; i < widget.data.length; i++) {
-      spots.add(
-        FlSpot(i.toDouble(), (widget.data[i]['value'] ?? 0).toDouble()),
+      final item = widget.data[i];
+      spots.add(FlSpot(i.toDouble(), item.totalValue.toDouble()));
+      labels.add(
+        '${DateFormat.MMM().format(DateTime(item.year, item.month))}/${item.year}',
       );
-      labels.add(widget.data[i]['title'] ?? '');
     }
+
+    final maxY =
+        widget.data
+            .map((e) => e.totalValue)
+            .reduce((a, b) => a > b ? a : b)
+            .toDouble();
 
     return LineChartData(
       gridData: FlGridData(
@@ -101,10 +96,10 @@ class _LineChartWidgetState extends State<LineChartWidget> {
           sideTitles: SideTitles(
             interval: 1000,
             showTitles: true,
-            reservedSize: 42,
+            reservedSize: 60,
             getTitlesWidget: (value, meta) {
               return Text(
-                '${value.toInt()}',
+                formatCurrency(value.toInt()),
                 style: const TextStyle(color: Colors.white, fontSize: 12),
               );
             },
@@ -122,26 +117,37 @@ class _LineChartWidgetState extends State<LineChartWidget> {
       minX: 0,
       maxX: widget.data.length.toDouble() - 1,
       minY: 0,
-      maxY:
-          widget.data
-              .map((e) => e['value'])
-              .cast<num>()
-              .reduce((a, b) => a > b ? a : b)
-              .toDouble() +
-          1000,
+      maxY: maxY + 1000,
+      lineTouchData: LineTouchData(
+        touchTooltipData: LineTouchTooltipData(
+          getTooltipItems: (touchedSpots) {
+            return touchedSpots.map((touchedSpot) {
+              return LineTooltipItem(
+                formatCurrency(touchedSpot.y.toInt()),
+                const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              );
+            }).toList();
+          },
+        ),
+      ),
       lineBarsData: [
         LineChartBarData(
           spots: spots,
           isCurved: true,
           gradient: LinearGradient(colors: gradientColors),
-          barWidth: 4,
+          barWidth: 1,
           isStrokeCapRound: true,
           dotData: const FlDotData(show: true),
+
           belowBarData: BarAreaData(
             show: true,
             gradient: LinearGradient(
               colors:
-                  gradientColors.map((c) => c..withValues(alpha: 0.3)).toList(),
+                  gradientColors.map((c) => c.withValues(alpha: 0.3)).toList(),
             ),
           ),
         ),
@@ -152,7 +158,7 @@ class _LineChartWidgetState extends State<LineChartWidget> {
   LineChartData avgData() {
     final spots = <FlSpot>[];
     final avg =
-        widget.data.map((e) => e['value'] as num).reduce((a, b) => a + b) /
+        widget.data.map((e) => e.totalValue).reduce((a, b) => a + b) /
         widget.data.length;
 
     for (var i = 0; i < widget.data.length; i++) {
@@ -165,10 +171,8 @@ class _LineChartWidgetState extends State<LineChartWidget> {
           spots: spots,
           isCurved: true,
           gradient: LinearGradient(
-            colors: [
-              gradientColors[0]..withValues(alpha: 0.5),
-              gradientColors[1]..withValues(alpha: 0.5),
-            ],
+            colors:
+                gradientColors.map((c) => c.withValues(alpha: 0.5)).toList(),
           ),
           barWidth: 4,
           isStrokeCapRound: true,

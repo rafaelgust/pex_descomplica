@@ -129,8 +129,8 @@ class _DashboardViewState extends State<DashboardView> {
                         const Divider(height: 1),
                         const SizedBox(height: 40),
                         responsive.isMobile(context)
-                            ? MobileCharts()
-                            : DesktopCharts(),
+                            ? MobileCharts(controller: _controller)
+                            : DesktopCharts(controller: _controller),
                         const SizedBox(height: 32),
                       ],
                     ),

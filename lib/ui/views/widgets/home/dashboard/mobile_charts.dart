@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../../../data/models/dashboard/monthly_bar_chart.dart';
 import '../../../../../data/models/dashboard/product_pie_chart.dart';
+import '../../../../controllers/dashboard_controller.dart';
 import 'charts/bar_chart_widget.dart';
 import 'charts/line_chart_widget.dart';
 import 'charts/pie_chart_widget.dart';
 import 'section_header.dart';
 
 class MobileCharts extends StatelessWidget {
-  const MobileCharts({super.key});
+  final DashboardController controller;
+
+  const MobileCharts({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -70,18 +73,20 @@ class MobileCharts extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LineChartWidget(
-                data: [
-                  {'title': 'Fev/2025', 'value': 2400},
-                  {'title': 'Mar/2025', 'value': 4000},
-                  {'title': 'Abr/2025', 'value': 1800},
-                  {'title': 'Mai/2025', 'value': 3200},
-                ],
-              ),
-            ],
+          child: ValueListenableBuilder(
+            valueListenable: controller.invoicesMonthly,
+            builder: (BuildContext context, dynamic value, Widget? child) {
+              if (value.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'Nenhum dado encontrado',
+                    style: TextStyle(fontSize: 16, color: Colors.black54),
+                  ),
+                );
+              } else {
+                return LineChartWidget(data: value);
+              }
+            },
           ),
         ),
 
