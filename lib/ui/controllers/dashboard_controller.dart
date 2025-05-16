@@ -139,8 +139,11 @@ class DashboardController extends ChangeNotifier {
         result.insert(
           0,
           InvoicesMonthlyModel(
-            year: result.first.year,
-            month: result.first.month,
+            year:
+                result.first.month == 1
+                    ? result.first.year - 1
+                    : result.first.year,
+            month: result.first.month == 1 ? 12 : result.first.month - 1,
             totalMovements: 0,
             totalQuantity: 0,
             totalValue: 0,

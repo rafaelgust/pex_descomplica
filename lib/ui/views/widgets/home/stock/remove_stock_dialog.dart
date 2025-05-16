@@ -7,6 +7,7 @@ import '../../../../../data/models/product_model.dart';
 import '../../../../../data/services/injector/injector_service.dart';
 import '../../../../view_models/customer_view_model.dart';
 import '../../../../view_models/stock_view_model.dart';
+import '../../currency_input_formatter.dart';
 
 class RemoveStockDialog extends StatefulWidget {
   final ProductModel product;
@@ -47,6 +48,8 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
     },
     {'value': 'outro', 'label': 'Outro', 'icon': Icons.more_horiz},
   ];
+
+  int? _priceInCents;
 
   @override
   void initState() {
@@ -109,11 +112,7 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
                 )['label'];
 
         final quantity = int.parse(_quantityController.text);
-        final price =
-            int.tryParse(
-              _priceController.text.replaceAll(',', '').replaceAll('.', ''),
-            ) ??
-            0;
+        final price = _priceInCents != null ? _priceInCents! : 0;
 
         String formattedDate = DateFormat(
           "yyyy-MM-ddTHH:mm:ss.mmmZ",
@@ -349,27 +348,28 @@ class _RemoveStockDialogState extends State<RemoveStockDialog> {
                           ),
                           prefixIcon: const Icon(Icons.attach_money),
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d+[,.]?\d{0,2}'),
-                          ),
-                        ],
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [CurrencyInputFormatter()],
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return null; // Preço não é obrigatório
+                            return null; // não obrigatório
                           }
 
-                          final price = double.tryParse(
-                            value.replaceAll(',', '.'),
+                          final cleaned = value.replaceAll(
+                            RegExp(r'[^\d]'),
+                            '',
                           );
-                          if (price == null || price < 0) {
-                            return 'Preço inválido';
-                          }
+                          final parsed = int.tryParse(cleaned);
+                          if (parsed == null) return 'Preço inválido';
 
                           return null;
+                        },
+                        onChanged: (value) {
+                          final cleaned = value.replaceAll(
+                            RegExp(r'[^\d]'),
+                            '',
+                          );
+                          _priceInCents = int.tryParse(cleaned);
                         },
                       ),
                       const SizedBox(height: 8),
