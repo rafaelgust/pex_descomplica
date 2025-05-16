@@ -129,6 +129,32 @@ class DashboardController extends ChangeNotifier {
     }
   }
 
+  Future<List<InvoicesMonthlyModel>> _getMonthlyRevenueData() async {
+    List<InvoicesMonthlyModel> data = [];
+
+    try {
+      final result = await invoiceController.getMontlyRevenue();
+
+      if (result.length == 1) {
+        result.insert(
+          0,
+          InvoicesMonthlyModel(
+            year: result.first.year,
+            month: result.first.month,
+            totalMovements: 0,
+            totalQuantity: 0,
+            totalValue: 0,
+          ),
+        );
+      }
+
+      data = result;
+    } catch (e) {
+      debugPrint('Error getting monthly revenue: $e');
+    }
+    return data;
+  }
+
   // InfoCard Basic
   Future<void> updateStockAmount() async {
     final quantity = await productController.getAmountProductsInStock();
@@ -183,7 +209,7 @@ class DashboardController extends ChangeNotifier {
     final monthName = monthToString(monthNumber);
     final yearNumber = dateNow.year;
 
-    final result = await invoiceController.getMontlyRevenue();
+    final result = await _getMonthlyRevenueData();
 
     invoicesMonthly.value = result;
 
