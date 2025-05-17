@@ -21,23 +21,18 @@ class _LineChartWidgetState extends State<LineChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: 700,
-        child: Card(
-          margin: const EdgeInsets.all(16),
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          color: const Color.fromARGB(255, 55, 48, 35),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
-            child: AspectRatio(
-              aspectRatio: 1.70,
-              child: LineChart(showAvg ? avgData() : mainData()),
-            ),
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 700, minWidth: 250),
+      child: Card(
+        margin: const EdgeInsets.all(16),
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: const Color.fromARGB(255, 55, 48, 35),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+          child: AspectRatio(
+            aspectRatio: 1.70,
+            child: LineChart(showAvg ? avgData() : mainData()),
           ),
         ),
       ),

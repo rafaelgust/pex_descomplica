@@ -19,32 +19,29 @@ class PieChartWidgetState extends State<PieChartWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Align(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: 700,
-        child: AspectRatio(
-          aspectRatio: 1.3,
-          child: PieChart(
-            PieChartData(
-              pieTouchData: PieTouchData(
-                touchCallback: (event, pieTouchResponse) {
-                  setState(() {
-                    if (!event.isInterestedForInteractions ||
-                        pieTouchResponse?.touchedSection == null) {
-                      touchedIndex = -1;
-                    } else {
-                      touchedIndex =
-                          pieTouchResponse!.touchedSection!.touchedSectionIndex;
-                    }
-                  });
-                },
-              ),
-              borderData: FlBorderData(show: false),
-              sectionsSpace: 2,
-              centerSpaceRadius: 0,
-              sections: showingSections(theme),
+    return SizedBox(
+      width: 700,
+      child: AspectRatio(
+        aspectRatio: 1.3,
+        child: PieChart(
+          PieChartData(
+            pieTouchData: PieTouchData(
+              touchCallback: (event, pieTouchResponse) {
+                setState(() {
+                  if (!event.isInterestedForInteractions ||
+                      pieTouchResponse?.touchedSection == null) {
+                    touchedIndex = -1;
+                  } else {
+                    touchedIndex =
+                        pieTouchResponse!.touchedSection!.touchedSectionIndex;
+                  }
+                });
+              },
             ),
+            borderData: FlBorderData(show: false),
+            sectionsSpace: 2,
+            centerSpaceRadius: 0,
+            sections: showingSections(theme),
           ),
         ),
       ),

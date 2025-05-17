@@ -36,6 +36,10 @@ class SectionCharts extends StatelessWidget {
               children: [
                 SectionHeader(title: 'Vendas Mensais', icon: Icons.trending_up),
                 Container(
+                  width:
+                      MediaQuery.of(context).size.width < 900
+                          ? 500
+                          : MediaQuery.of(context).size.width - 48,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -67,13 +71,18 @@ class SectionCharts extends StatelessWidget {
           Container(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SectionHeader(
                   title: 'Produtos Populares',
                   icon: Icons.pie_chart,
                 ),
                 Container(
+                  width:
+                      MediaQuery.of(context).size.width < 900
+                          ? 500
+                          : MediaQuery.of(context).size.width - 48,
+
                   height: 400,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -102,7 +111,10 @@ class SectionCharts extends StatelessWidget {
                   icon: Icons.bar_chart,
                 ),
                 Container(
-                  width: double.infinity,
+                  width:
+                      MediaQuery.of(context).size.width < 900
+                          ? 500
+                          : MediaQuery.of(context).size.width - 48,
                   height: 520,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
