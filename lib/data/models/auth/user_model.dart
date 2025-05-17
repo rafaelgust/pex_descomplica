@@ -18,9 +18,7 @@ class UserModel {
 
   String get fullName => '$firstName $lastName';
   String get urlAvatar =>
-      avatar.isEmpty
-          ? Constants.defaultAvatar
-          : '${Constants.urlApi}/api/files/users/$id/$avatar';
+      avatar.isEmpty ? '' : '${Constants.urlApi}/api/files/users/$id/$avatar';
 
   String get createdAt {
     if (created != null) {
