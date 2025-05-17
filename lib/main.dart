@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'config/providers.dart';
 import 'config/routers.dart';
+import 'core/controllers/app_controller.dart';
 import 'data/services/injector/injector_service.dart';
 import 'data/services/pocket_base/pocket_base.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -50,11 +51,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: appRouter(),
-      locale: const Locale('pt', 'BR'),
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.orange),
-      debugShowCheckedModeBanner: false,
+    return AnimatedBuilder(
+      animation: AppController.instance,
+      builder: (context, child) {
+        return child ?? const SizedBox.shrink();
+      },
+      child: MaterialApp.router(
+        routerConfig: appRouter(),
+        locale: const Locale('pt', 'BR'),
+        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.orange),
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }
