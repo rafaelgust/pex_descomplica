@@ -1,35 +1,35 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/auth/user_model.dart';
-
-import '../../data/repositories/auth/auth_repository.dart';
+import '../controllers/user_controller.dart';
 
 class HomeViewModel extends ChangeNotifier {
-  final AuthRepository authRepository;
+  final UserController _userController;
 
-  HomeViewModel(this.authRepository);
+  HomeViewModel(this._userController) {
+    _init();
+  }
 
   final ValueNotifier<UserModel?> userData = ValueNotifier<UserModel?>(null);
 
   @override
   void dispose() {
     userData.dispose();
+    _userController.removeListener(() {
+      userData.value = _userController.userData;
+    });
     super.dispose();
   }
 
-  int? selectedIndex;
+  _init() async {
+    _userController.addListener(() {
+      userData.value = _userController.userData;
+    });
 
-  initialize() async {
-    final user = await authRepository.getCurrentUser();
-    user.fold(
-      (error) {
-        return;
-      },
-      (user) {
-        userData.value = user;
-      },
-    );
+    await _userController.loadUserData();
   }
+
+  int? selectedIndex;
 
   void onItemTapped(int index) {
     if (index == selectedIndex) return;

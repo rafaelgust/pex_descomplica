@@ -8,6 +8,7 @@ import '../data/repositories/invoice/invoice_repository.dart';
 import '../data/repositories/product/product_repository.dart';
 import '../data/repositories/stock/stock_repository.dart';
 import '../data/repositories/supplier/supplier_repository.dart';
+import '../data/repositories/user/user_repository.dart';
 import '../data/services/auth_service.dart';
 import '../data/services/image_picker/image_picker_service.dart';
 import '../data/services/injector/injector_service.dart';
@@ -24,6 +25,7 @@ import '../ui/controllers/product_controller.dart';
 import '../ui/view_models/customer_view_model.dart';
 import '../ui/view_models/home_view_model.dart';
 import '../ui/view_models/order_view_model.dart';
+import '../ui/controllers/user_controller.dart';
 import '../ui/view_models/stock_view_model.dart';
 import '../ui/view_models/supplier_view_model.dart';
 
@@ -56,6 +58,10 @@ class Providers {
 
     injector.registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(injector.get<AuthService>()),
+    );
+
+    injector.registerLazySingleton<UserRepository>(
+      () => UserRepositoryImpl(pbService, injector.get<HttpService>()),
     );
 
     injector.registerFactory<CategoryRepository>(
@@ -103,10 +109,16 @@ class Providers {
         injector.get<InvoiceController>(),
       ),
     );
+    injector.registerLazySingleton<UserController>(
+      () => UserController(
+        injector.get<AuthRepository>(),
+        injector.get<UserRepository>(),
+      ),
+    );
     // ===== ViewModels =====
 
     injector.registerLazySingleton<HomeViewModel>(
-      () => HomeViewModel(injector.get<AuthRepository>()),
+      () => HomeViewModel(injector.get<UserController>()),
     );
 
     injector.registerLazySingleton<StockViewModel>(() => StockViewModel());

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../data/models/auth/user_model.dart';
-import '../view_models/profile_view_model.dart';
+import '../../data/services/injector/injector_service.dart';
+import '../controllers/user_controller.dart';
+import 'widgets/home/profile/change_pass.dart';
+import 'widgets/home/profile/edit_user_dialog.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -11,28 +14,15 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView>
     with SingleTickerProviderStateMixin {
-  final ProfileViewModel _viewModel = ProfileViewModel();
+  final UserController _controller = injector.get<UserController>();
 
-  final _currentPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
-  bool _obscureCurrentPassword = true;
-  bool _obscureNewPassword = true;
-  bool _obscureConfirmPassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _viewModel.loadUserData();
-  }
-
-  @override
-  void dispose() {
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
+  void _openEditProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return EditUserDialog();
+      },
+    );
   }
 
   @override
@@ -40,13 +30,13 @@ class _ProfileViewState extends State<ProfileView>
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: AnimatedBuilder(
-        animation: _viewModel,
+        animation: _controller,
         builder: (context, child) {
-          if (_viewModel.isLoading) {
+          if (_controller.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (_viewModel.errorMessage?.isNotEmpty == true) {
+          if (_controller.errorMessage?.isNotEmpty == true) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +48,7 @@ class _ProfileViewState extends State<ProfileView>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    _viewModel.errorMessage!,
+                    _controller.errorMessage!,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.error,
                       fontSize: 16,
@@ -66,7 +56,7 @@ class _ProfileViewState extends State<ProfileView>
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
-                    onPressed: () => _viewModel.loadUserData(),
+                    onPressed: () => _controller.loadUserData(),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Tentar Novamente'),
                   ),
@@ -75,233 +65,72 @@ class _ProfileViewState extends State<ProfileView>
             );
           }
 
-          final userData = _viewModel.userData;
-          if (userData == null) {
+          final userData = _controller.userData;
+          if (userData.email.isEmpty) {
             return const Center(
               child: Text("Dados do usuário não disponíveis."),
             );
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
-              children: [
-                _buildProfileHeader(userData),
-                const SizedBox(height: 24),
-                Center(
-                  child: SizedBox(
-                    width: 500,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+          return Center(
+            child: Container(
+              width: 500,
+              padding: const EdgeInsets.all(8.0),
+              child: ListView(
+                children: [
+                  _buildProfileHeader(userData),
+                  const SizedBox(height: 24),
+                  ChangePass(),
+                  const SizedBox(height: 32),
+
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: InkWell(
+                      onTap: () {
+                        _controller.logout(context);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
                           children: [
-                            Icon(
-                              Icons.shield,
-                              color: Theme.of(context).colorScheme.primary,
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.logout,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 16),
                             Text(
-                              'Segurança da Conta',
-                              style: Theme.of(context).textTheme.titleLarge,
+                              'Desconectar',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
-
-                        Card(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.outline.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Alterar Senha',
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 16),
-
-                                TextField(
-                                  controller: _currentPasswordController,
-                                  obscureText: _obscureCurrentPassword,
-                                  decoration: InputDecoration(
-                                    labelText: 'Senha Atual',
-                                    prefixIcon: const Icon(Icons.lock_outline),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscureCurrentPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureCurrentPassword =
-                                              !_obscureCurrentPassword;
-                                        });
-                                      },
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                TextField(
-                                  controller: _newPasswordController,
-                                  obscureText: _obscureNewPassword,
-                                  decoration: InputDecoration(
-                                    labelText: 'Nova Senha',
-                                    prefixIcon: const Icon(
-                                      Icons.vpn_key_outlined,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscureNewPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureNewPassword =
-                                              !_obscureNewPassword;
-                                        });
-                                      },
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                TextField(
-                                  controller: _confirmPasswordController,
-                                  obscureText: _obscureConfirmPassword,
-                                  decoration: InputDecoration(
-                                    labelText: 'Confirmar Nova Senha',
-                                    prefixIcon: const Icon(
-                                      Icons.check_circle_outline,
-                                    ),
-                                    suffixIcon: IconButton(
-                                      icon: Icon(
-                                        _obscureConfirmPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          _obscureConfirmPassword =
-                                              !_obscureConfirmPassword;
-                                        });
-                                      },
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton.icon(
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 16,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      _showPasswordUpdateConfirmation();
-                                    },
-                                    icon: const Icon(Icons.lock_reset),
-                                    label: const Text('Atualizar Senha'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        Card(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.outline.withValues(alpha: 0.3),
-                            ),
-                          ),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          child: InkWell(
-                            onTap: () {
-                              _viewModel.logout(context);
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.1),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.logout,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Desconectar',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -343,11 +172,23 @@ class _ProfileViewState extends State<ProfileView>
                     ),
                   ],
                 ),
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage(userData.urlAvatar),
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                ),
+                child:
+                    userData.urlAvatar.isNotEmpty
+                        ? CircleAvatar(
+                          radius: 50,
+                          backgroundImage: NetworkImage(userData.urlAvatar),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.surface,
+                        )
+                        : const CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey,
+                          child: Icon(
+                            Icons.person_sharp,
+                            size: 50,
+                            color: Colors.white,
+                          ),
+                        ),
               ),
               Container(
                 padding: const EdgeInsets.all(2),
@@ -356,11 +197,17 @@ class _ProfileViewState extends State<ProfileView>
                   shape: BoxShape.circle,
                 ),
                 child: Container(
-                  height: 20,
-                  width: 20,
+                  height: 30,
+                  width: 30,
                   decoration: BoxDecoration(
-                    color: _getStatusColor(userData.verified),
+                    color: Theme.of(context).colorScheme.primary,
                     shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.edit, size: 16, color: Colors.white),
+                    onPressed: () {
+                      _openEditProfileDialog();
+                    },
                   ),
                 ),
               ),
@@ -476,40 +323,5 @@ class _ProfileViewState extends State<ProfileView>
     if (status == true) return Colors.green;
     if (status == false) return Colors.red;
     return Colors.orange;
-  }
-
-  void _showPasswordUpdateConfirmation() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.green),
-              SizedBox(width: 8),
-              Text('Senha Atualizada'),
-            ],
-          ),
-          content: const Text(
-            'Sua senha foi atualizada com sucesso. Use sua nova senha para futuros logins.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Limpar os campos de senha
-                _currentPasswordController.clear();
-                _newPasswordController.clear();
-                _confirmPasswordController.clear();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
   }
 }

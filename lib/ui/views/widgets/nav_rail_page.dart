@@ -25,7 +25,7 @@ class _NavRailPageState extends State<NavRailPage>
   @override
   void initState() {
     super.initState();
-    _homeViewModel.initialize();
+
     _homeViewModel.selectedIndex = _homeViewModel.selectedByLocation(
       Routers.getPath(context),
     );
@@ -122,14 +122,27 @@ class _NavRailPageState extends State<NavRailPage>
                                     );
                                   }
                                   return Center(
-                                    child: CircleAvatar(
-                                      radius: 60,
-                                      backgroundImage:
-                                          Image.network(
-                                            userData.urlAvatar,
-                                            fit: BoxFit.cover,
-                                          ).image,
-                                    ),
+                                    child:
+                                        userData.urlAvatar.isNotEmpty
+                                            ? CircleAvatar(
+                                              radius: 60,
+                                              backgroundImage: NetworkImage(
+                                                userData.urlAvatar,
+                                              ),
+                                              backgroundColor:
+                                                  Theme.of(
+                                                    context,
+                                                  ).colorScheme.surface,
+                                            )
+                                            : const CircleAvatar(
+                                              radius: 60,
+                                              backgroundColor: Colors.grey,
+                                              child: Icon(
+                                                Icons.person_sharp,
+                                                size: 40,
+                                                color: Colors.white,
+                                              ),
+                                            ),
                                   );
                                 },
                               ),
@@ -284,14 +297,23 @@ class _NavRailPageState extends State<NavRailPage>
                   );
                 }
                 return Center(
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundImage:
-                        Image.network(
-                          userData.urlAvatar,
-                          fit: BoxFit.cover,
-                        ).image,
-                  ),
+                  child:
+                      userData.urlAvatar.isNotEmpty
+                          ? CircleAvatar(
+                            radius: 40,
+                            backgroundImage: NetworkImage(userData.urlAvatar),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
+                          )
+                          : const CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.grey,
+                            child: Icon(
+                              Icons.person_sharp,
+                              size: 40,
+                              color: Colors.white,
+                            ),
+                          ),
                 );
               },
             ),

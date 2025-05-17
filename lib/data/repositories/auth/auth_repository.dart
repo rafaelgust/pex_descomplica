@@ -7,14 +7,6 @@ import 'auth_failure.dart';
 abstract class AuthRepository {
   Future<Either<AuthFailure, UserModel>> login(String email, String password);
 
-  Future<Either<AuthFailure, bool>> register({
-    required String email,
-    required String password,
-    required String username,
-    required String firstName,
-    required String lastName,
-  });
-
   Future<Either<AuthFailure, bool>> logout();
 
   Future<Either<AuthFailure, bool>> isUsernameAvailable(String username);
