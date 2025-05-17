@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../data/models/dashboard/info_card_model.dart';
+import '../../data/models/dashboard/product_pie_chart.dart';
+import '../../data/models/invoice/invoices_monthly_model.dart';
 import '../../data/services/injector/injector_service.dart';
 import '../controllers/dashboard_controller.dart';
 
-import 'widgets/home/dashboard/desktop_charts.dart';
+import 'widgets/home/dashboard/section_charts.dart';
 import 'widgets/home/dashboard/infor_card.dart';
-import 'widgets/home/dashboard/mobile_charts.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -16,6 +17,30 @@ class DashboardView extends StatefulWidget {
 
 class _DashboardViewState extends State<DashboardView> {
   final DashboardController _controller = injector.get<DashboardController>();
+
+  final List<ProductPieChart> _pieChartData = [
+    ProductPieChart(
+      name: 'Café',
+      amount: 60,
+      urlImage:
+          'https://castronaves.vteximg.com.br/arquivos/ids/384748-1000-1000/9330_01.jpg',
+    ),
+    ProductPieChart(
+      name: 'Açúcar',
+      amount: 120,
+      urlImage:
+          'https://carrefourbrfood.vtexassets.com/arquivos/ids/110671165/acucar-refinado-uniao-docucar-1kg-1.jpg',
+    ),
+    ProductPieChart(
+      name: 'Arroz',
+      amount: 50,
+      urlImage: 'https://m.media-amazon.com/images/I/71rBEHnIkXL.jpg',
+    ),
+  ];
+
+  final List<InvoicesMonthlyModel> _barChartData = [];
+
+  final List<InfoCardModel> _infoCards = [];
 
   void _setState() => setState(() {});
 
@@ -37,12 +62,33 @@ class _DashboardViewState extends State<DashboardView> {
   Future<void> _loadData() async {
     if (mounted) {
       await _controller.init();
+      _infoCards.addAll(_controller.infoCards);
+      _barChartData.addAll(_controller.invoicesMonthly);
+      setState(() {});
     }
   }
 
   Future<void> _updateData() async {
     if (mounted) {
+      _updateInfoCards();
+      _updateBarChartData();
+    }
+  }
+
+  Future<void> _updateInfoCards() async {
+    if (mounted) {
       await _controller.updateInfoCards();
+      _infoCards.clear();
+      _infoCards.addAll(_controller.infoCards);
+      setState(() {});
+    }
+  }
+
+  Future<void> _updateBarChartData() async {
+    if (mounted) {
+      _barChartData.clear();
+      _barChartData.addAll(_controller.invoicesMonthly);
+      setState(() {});
     }
   }
 
@@ -104,31 +150,23 @@ class _DashboardViewState extends State<DashboardView> {
                           ),
                         ),
                         Center(
-                          child: ValueListenableBuilder<List<InfoCardModel>>(
-                            valueListenable: _controller.infoCards,
-                            builder: (
-                              BuildContext context,
-                              List<InfoCardModel> value,
-                              child,
-                            ) {
-                              return Wrap(
-                                spacing: 20,
-                                runSpacing: 20,
-                                alignment: WrapAlignment.center,
-                                children:
-                                    value
-                                        .map((i) => InforCard(item: i))
-                                        .toList(),
-                              );
-                            },
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 20,
+                            alignment: WrapAlignment.center,
+                            children:
+                                _infoCards
+                                    .map((i) => InforCard(item: i))
+                                    .toList(),
                           ),
                         ),
                         const SizedBox(height: 40),
                         const Divider(height: 1),
                         const SizedBox(height: 40),
-                        MediaQuery.of(context).size.width < 1200
-                            ? MobileCharts(controller: _controller)
-                            : DesktopCharts(controller: _controller),
+                        SectionCharts(
+                          invoicesMonthly: _barChartData,
+                          pieChartData: _pieChartData,
+                        ),
                         const SizedBox(height: 32),
                       ],
                     ),

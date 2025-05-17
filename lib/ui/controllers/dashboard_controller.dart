@@ -20,20 +20,20 @@ class DashboardController extends ChangeNotifier {
     this.invoiceController,
   );
 
-  final ValueNotifier<List<InfoCardModel>> infoCards = ValueNotifier([]);
-  final ValueNotifier<List<InvoicesMonthlyModel>> invoicesMonthly =
-      ValueNotifier<List<InvoicesMonthlyModel>>([]);
+  final List<InfoCardModel> infoCards = [];
+  final List<InvoicesMonthlyModel> invoicesMonthly = [];
+
   bool isLoading = false;
 
   Future<void> init() async {
     try {
       isLoading = true;
+      notifyListeners();
       await updateInfoCards();
     } catch (e) {
       debugPrint('Error initializing dashboard: $e');
     } finally {
       isLoading = false;
-      notifyListeners();
     }
   }
 
@@ -52,8 +52,8 @@ class DashboardController extends ChangeNotifier {
       if (monthlyRevenue != null) newCards.add(monthlyRevenue);
 
       if (newCards.isNotEmpty) {
-        infoCards.value = newCards;
-        infoCards.notifyListeners();
+        infoCards.clear();
+        infoCards.addAll(newCards);
       }
     } catch (e) {
       debugPrint('Error getting info cards: $e');
@@ -90,8 +90,6 @@ class DashboardController extends ChangeNotifier {
 
   Future<void> updateInfoCards() async {
     try {
-      infoCards.value.clear();
-
       await updateStockAmount();
       await updateDebts();
       await updatePendingOrders();
@@ -214,7 +212,8 @@ class DashboardController extends ChangeNotifier {
 
     final result = await _getMonthlyRevenueData();
 
-    invoicesMonthly.value = result;
+    invoicesMonthly.clear();
+    invoicesMonthly.addAll(result);
 
     final monthRevenue = result.firstWhere(
       (item) => item.month == monthNumber && item.year == yearNumber,
