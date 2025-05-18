@@ -10,12 +10,14 @@ class UserController extends ChangeNotifier {
   bool isLoading = false;
   String? errorMessage;
 
-  late UserModel userData;
+  UserModel? userData;
 
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
 
-  UserController(this._authRepository, this._userRepository);
+  UserController(this._authRepository, this._userRepository) {
+    loadUserData();
+  }
 
   Future<void> loadUserData() async {
     isLoading = true;
@@ -40,6 +42,36 @@ class UserController extends ChangeNotifier {
     } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+    required BuildContext context,
+  }) async {
+    if (userData == null) {
+      throw Exception('Dados do usuário não carregados.');
+    }
+
+    Map<String, dynamic> itemsChanged = {
+      'oldPassword': currentPassword,
+      'password': newPassword,
+      'passwordConfirm': confirmPassword,
+    };
+
+    try {
+      var result = await _userRepository.updateUser(
+        id: userData!.id,
+        itemsChanged: itemsChanged,
+      );
+
+      result.fold((failure) => throw Exception(failure.message), (_) {
+        logout(context);
+      });
+    } catch (e) {
+      throw Exception('Failed to change password: $e');
     }
   }
 
@@ -83,7 +115,7 @@ class UserController extends ChangeNotifier {
     errorMessage = null;
     Map<String, dynamic> itemsChanged = {};
 
-    if (username != userData.username) {
+    if (username != userData!.username) {
       _authRepository.isUsernameAvailable(username).then((result) {
         result.fold(
           (failure) {
@@ -100,17 +132,17 @@ class UserController extends ChangeNotifier {
       });
     }
 
-    if (firstName != userData.firstName) {
+    if (firstName != userData!.firstName) {
       itemsChanged['first_name'] = firstName;
     }
 
-    if (lastName != userData.lastName) {
+    if (lastName != userData!.lastName) {
       itemsChanged['last_name'] = lastName;
     }
 
     try {
       var result = await _userRepository.updateUser(
-        id: userData.id,
+        id: userData!.id,
         itemsChanged: itemsChanged,
         imageFile: imageFile,
       );

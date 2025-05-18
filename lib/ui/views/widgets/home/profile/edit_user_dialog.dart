@@ -267,7 +267,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         right: 8,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: colorScheme.surface.withOpacity(0.7),
+                            color: colorScheme.surface.withValues(alpha: 0.7),
                             shape: BoxShape.circle,
                           ),
                           child: IconButton(

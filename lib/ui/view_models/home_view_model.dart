@@ -12,20 +12,20 @@ class HomeViewModel extends ChangeNotifier {
 
   final ValueNotifier<UserModel?> userData = ValueNotifier<UserModel?>(null);
 
+  void userDataListener() {
+    userData.value = _userController.userData;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     userData.dispose();
-    _userController.removeListener(() {
-      userData.value = _userController.userData;
-    });
+    _userController.removeListener(() => userDataListener());
     super.dispose();
   }
 
   _init() async {
-    _userController.addListener(() {
-      userData.value = _userController.userData;
-    });
-
+    _userController.addListener(() => userDataListener());
     await _userController.loadUserData();
   }
 

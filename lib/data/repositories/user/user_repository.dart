@@ -86,6 +86,7 @@ class UserRepositoryImpl implements UserRepository {
       final response = await _pocketBase.register(
         collection: 'users',
         body: body,
+        expand: 'role',
         files: [file],
       );
 
@@ -128,6 +129,7 @@ class UserRepositoryImpl implements UserRepository {
         id: id,
         body: body,
         files: imageFile != null ? [file] : null,
+        expand: 'role',
       );
 
       return response.when(
@@ -149,7 +151,7 @@ class UserRepositoryImpl implements UserRepository {
       final response = await _pocketBase.update(
         collection: 'users',
         id: id,
-
+        expand: 'role',
         body: {'verified': false},
       );
 
@@ -171,7 +173,11 @@ class UserRepositoryImpl implements UserRepository {
     required String id,
   }) async {
     try {
-      final user = await _pocketBase.getOne(collection: 'users', id: id);
+      final user = await _pocketBase.getOne(
+        collection: 'users',
+        id: id,
+        expand: 'role',
+      );
 
       return user.when(
         success: (successResponse) async {
@@ -198,6 +204,7 @@ class UserRepositoryImpl implements UserRepository {
         page: page ?? 1,
         perPage: perPage ?? 30,
         filter: name != null ? 'name~"$name"' : '',
+        expand: 'role',
         sort: '-updated',
       );
 
@@ -228,6 +235,7 @@ class UserRepositoryImpl implements UserRepository {
         page: 1,
         perPage: 30,
         filter: 'first_name~"$name" || last_name~"$name"',
+        expand: 'role',
         sort: '-updated',
       );
 
@@ -260,6 +268,7 @@ class UserRepositoryImpl implements UserRepository {
         page: page,
         perPage: perPage,
         filter: filter,
+        expand: 'role',
         sort: '-updated',
       );
 

@@ -56,7 +56,7 @@ class _ProfileViewState extends State<ProfileView>
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
-                    onPressed: () => _controller.loadUserData(),
+                    onPressed: () => _controller.logout(context),
                     icon: const Icon(Icons.refresh),
                     label: const Text('Tentar Novamente'),
                   ),
@@ -65,72 +65,80 @@ class _ProfileViewState extends State<ProfileView>
             );
           }
 
-          final userData = _controller.userData;
+          final userData = _controller.userData!;
           if (userData.email.isEmpty) {
             return const Center(
               child: Text("Dados do usuário não disponíveis."),
             );
           }
 
-          return Center(
-            child: Container(
-              width: 500,
-              padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  _buildProfileHeader(userData),
-                  const SizedBox(height: 24),
-                  ChangePass(),
-                  const SizedBox(height: 32),
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                _buildProfileHeader(userData),
+                Expanded(
+                  child: SizedBox(
+                    width: 500,
+                    child: ListView(
+                      children: [
+                        const SizedBox(height: 24),
+                        ChangePass(),
+                        const SizedBox(height: 32),
 
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    child: InkWell(
-                      onTap: () {
-                        _controller.logout(context);
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.logout,
-                                color: Theme.of(context).colorScheme.primary,
+                        Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: InkWell(
+                            onTap: () {
+                              _controller.logout(context);
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.logout,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'Desconectar',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            Text(
-                              'Desconectar',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },

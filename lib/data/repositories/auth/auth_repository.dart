@@ -125,6 +125,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<AuthFailure, UserModel?>> getCurrentUser() async {
     try {
       final user = await _authService.getUserData();
+      if (user == null) {
+        return const Left(AuthenticationFailure('User not found'));
+      }
       return Right(user);
     } catch (e) {
       return Left(NetworkFailure(e.toString()));
