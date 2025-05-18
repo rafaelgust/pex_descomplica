@@ -4,7 +4,6 @@ import '../../../config/routers.dart';
 import '../../../data/services/injector/injector_service.dart';
 import '../../responsive_helper.dart';
 import '../../view_models/home_view_model.dart';
-import 'home/notifications_dialog.dart';
 
 class NavRailPage extends StatefulWidget {
   final Widget? child;
@@ -48,15 +47,6 @@ class _NavRailPageState extends State<NavRailPage>
     super.dispose();
   }
 
-  void _showNotificationsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return NotificationsDialog();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool isMobile = _responsiveHelper.isMobile(context);
@@ -68,12 +58,6 @@ class _NavRailPageState extends State<NavRailPage>
               ? AppBar(
                 foregroundColor: Theme.of(context).primaryColor,
                 elevation: 2,
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.notifications_outlined),
-                    onPressed: () => _showNotificationsDialog(context),
-                  ),
-                ],
               )
               : null,
       drawer: isMobile ? _buildDrawer(context) : null,
@@ -108,18 +92,19 @@ class _NavRailPageState extends State<NavRailPage>
                             right: 0,
                             left: 0,
                             bottom: 0,
-                            child: SizedBox(
-                              width: 30,
-                              height: 30,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2,
+                                ),
+                              ),
                               child: ValueListenableBuilder(
                                 valueListenable: _homeViewModel.userData,
                                 builder: (context, userData, child) {
                                   if (userData == null) {
-                                    return const CircleAvatar(
-                                      radius: 60,
-                                      backgroundColor: Colors.grey,
-                                      child: Icon(Icons.person, size: 30),
-                                    );
+                                    return SizedBox.shrink();
                                   }
                                   return Center(
                                     child:
@@ -145,31 +130,6 @@ class _NavRailPageState extends State<NavRailPage>
                                             ),
                                   );
                                 },
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 30,
-                            right: 0,
-                            left: 30,
-                            bottom: 0,
-                            child: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.notifications_outlined,
-                                  color: Colors.white,
-                                ),
-                                tooltip: 'Notificações',
-                                iconSize: 15,
-                                color: Colors.white,
-                                onPressed:
-                                    () => _showNotificationsDialog(context),
                               ),
                             ),
                           ),
@@ -290,10 +250,9 @@ class _NavRailPageState extends State<NavRailPage>
               valueListenable: _homeViewModel.userData,
               builder: (context, userData, child) {
                 if (userData == null) {
-                  return const CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 30),
+                  return const CircularProgressIndicator(
+                    color: Colors.white,
+                    backgroundColor: Colors.blue,
                   );
                 }
                 return Center(
