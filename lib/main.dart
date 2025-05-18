@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         routerConfig: appRouter(),
         locale: const Locale('pt', 'BR'),
-        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.orange),
+        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.red),
         debugShowCheckedModeBanner: false,
       ),
     );
