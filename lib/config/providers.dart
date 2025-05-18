@@ -22,6 +22,7 @@ import '../data/services/storage/storage_service.dart';
 import '../ui/controllers/dashboard_controller.dart';
 import '../ui/controllers/invoice_controller.dart';
 import '../ui/controllers/product_controller.dart';
+import '../ui/controllers/setting_controller.dart';
 import '../ui/view_models/customer_view_model.dart';
 import '../ui/view_models/home_view_model.dart';
 import '../ui/view_models/order_view_model.dart';
@@ -114,6 +115,10 @@ class Providers {
         injector.get<AuthRepository>(),
         injector.get<UserRepository>(),
       ),
+    );
+
+    injector.registerLazySingleton<SettingController>(
+      () => SettingController(injector.get<UserRepository>()),
     );
     // ===== ViewModels =====
 

@@ -177,6 +177,8 @@ class UserRepositoryImpl implements UserRepository {
         collection: 'users',
         id: id,
         expand: 'role',
+        fields:
+            'id,collectionId,username,first_name,last_name,avatar,email,expand.role.id,expand.role.name',
       );
 
       return user.when(
@@ -205,11 +207,17 @@ class UserRepositoryImpl implements UserRepository {
         perPage: perPage ?? 30,
         filter: name != null ? 'name~"$name"' : '',
         expand: 'role',
+        fields:
+            'id,collectionId,username,first_name,last_name,avatar,email,expand.role.id,expand.role.name',
         sort: '-updated',
       );
 
       return users.when(
         success: (successResponse) async {
+          if (successResponse.items.isEmpty) {
+            return const Left(UserSearchFailure('No users found'));
+          }
+
           return Right(
             successResponse.items
                 .map((item) => UserModel.fromJson(item))
@@ -236,6 +244,8 @@ class UserRepositoryImpl implements UserRepository {
         perPage: 30,
         filter: 'first_name~"$name" || last_name~"$name"',
         expand: 'role',
+        fields:
+            'id,collectionId,username,first_name,last_name,avatar,email,expand.role.id,expand.role.name',
         sort: '-updated',
       );
 
@@ -269,6 +279,8 @@ class UserRepositoryImpl implements UserRepository {
         perPage: perPage,
         filter: filter,
         expand: 'role',
+        fields:
+            'id,collectionId,username,first_name,last_name,avatar,email,expand.role.id,expand.role.name',
         sort: '-updated',
       );
 
