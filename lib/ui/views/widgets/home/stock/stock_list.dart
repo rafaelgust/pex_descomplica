@@ -301,22 +301,6 @@ class _StockListState extends State<StockList> {
                                                 );
                                               },
                                             ),
-                                            ListTile(
-                                              leading: const Icon(
-                                                Icons.delete_outline,
-                                                color: Colors.red,
-                                              ),
-                                              title: const Text(
-                                                'Excluir produto',
-                                                style: TextStyle(
-                                                  color: Colors.red,
-                                                ),
-                                              ),
-                                              onTap: () {
-                                                Navigator.pop(context);
-                                                // Confirmar exclusão
-                                              },
-                                            ),
                                           ],
                                         );
                                       },

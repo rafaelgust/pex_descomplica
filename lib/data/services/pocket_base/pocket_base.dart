@@ -31,9 +31,16 @@ class PocketBaseService {
     String fields = '',
   }) async {
     try {
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      String token = await _storage.getItem('token') ?? '';
+      if (token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final result = await _client
           .collection(collection)
           .getFullList(
+            headers: headers,
             filter: filter,
             sort: sort,
             expand: expand,
@@ -74,9 +81,16 @@ class PocketBaseService {
     String fields = '',
   }) async {
     try {
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      String token = await _storage.getItem('token') ?? '';
+      if (token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final result = await _client
           .collection(collection)
           .getList(
+            headers: headers,
             page: page,
             perPage: perPage,
             filter: filter,
@@ -119,13 +133,19 @@ class PocketBaseService {
     String expand = '',
   }) async {
     try {
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      String token = await _storage.getItem('token') ?? '';
+      if (token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       RecordModel record;
 
       if (id != null) {
         // Busca por ID
         record = await _client
             .collection(collection)
-            .getOne(id, expand: expand, fields: fields);
+            .getOne(id, headers: headers, expand: expand, fields: fields);
       } else if (filter != null) {
         // Busca por filtro personalizado
         final filterString = filter.entries
@@ -135,6 +155,7 @@ class PocketBaseService {
         final result = await _client
             .collection(collection)
             .getList(
+              headers: headers,
               page: 1,
               perPage: 1,
               filter: filterString,
@@ -186,9 +207,16 @@ class PocketBaseService {
     String expand = '',
   }) async {
     try {
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      String token = await _storage.getItem('token') ?? '';
+      if (token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       final result = await _client
           .collection(collection)
           .getList(
+            headers: headers,
             page: 1,
             perPage: 1,
             filter: filter,
@@ -403,11 +431,17 @@ class PocketBaseService {
     List<http.MultipartFile>? files,
   }) async {
     try {
+      Map<String, String> headers = {'Content-Type': 'application/json'};
+      String token = await _storage.getItem('token') ?? '';
+      if (token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
       files ??= [];
 
       final record = await _client
           .collection(collection)
-          .create(body: body, files: files, expand: expand);
+          .create(headers: headers, body: body, files: files, expand: expand);
 
       return SuccessPocketBaseResponse<T>(
         items: [record.toJson() as T],

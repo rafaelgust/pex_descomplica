@@ -166,7 +166,6 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
                   controller: _nameController,
                   decoration: InputDecoration(
                     labelText: 'Nome do Produto*',
-                    hintText: 'Ex: Arroz Integral',
                     prefixIcon: const Icon(Icons.inventory),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -215,7 +214,6 @@ class _AddProductItemDialogState extends State<AddProductItemDialog> {
                   controller: _descriptionController,
                   decoration: InputDecoration(
                     labelText: 'Descrição',
-                    hintText: 'Ex: Arroz integral tipo 1, pacote de 1kg',
                     prefixIcon: const Icon(Icons.description),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
