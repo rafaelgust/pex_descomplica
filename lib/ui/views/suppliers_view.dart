@@ -121,50 +121,53 @@ class _SuppliersViewState extends State<SuppliersView> {
 
     return RefreshIndicator(
       onRefresh: _refreshProducts,
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).colorScheme.onPrimary,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
-          children: [
-            SupplierSearchBar(
-              isSearching: _viewModel.isSearching,
-              initialValue: _viewModel.searchText,
-              onChange: (value) {
-                _viewModel.searchText = value;
-              },
-              onSearch: (value) => _viewModel.searchSuppliers(),
-            ),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: _viewModel,
-                builder: (context, child) {
-                  if (_viewModel.isSearching) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (_viewModel.suppliers.isEmpty ||
-                      _viewModel.totalItems == 0) {
-                    return SupplierNotFound();
-                  }
-
-                  return child!;
+      child: Center(
+        child: Container(
+          width: 1720,
+          height: double.infinity,
+          color: Theme.of(context).colorScheme.onPrimary,
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
+            children: [
+              SupplierSearchBar(
+                isSearching: _viewModel.isSearching,
+                initialValue: _viewModel.searchText,
+                onChange: (value) {
+                  _viewModel.searchText = value;
                 },
-                child: SupplierList(
-                  suppliers: _viewModel.suppliers,
-                  totalItems: _viewModel.totalItems ?? 0,
-                  onEdit:
-                      (supplier) => _showEditSupplierDialog(context, supplier),
-                  onDelete:
-                      (supplier) =>
-                          _showDeleteConfirmationDialog(context, supplier),
+                onSearch: (value) => _viewModel.searchSuppliers(),
+              ),
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: _viewModel,
+                  builder: (context, child) {
+                    if (_viewModel.isSearching) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (_viewModel.suppliers.isEmpty ||
+                        _viewModel.totalItems == 0) {
+                      return SupplierNotFound();
+                    }
+
+                    return child!;
+                  },
+                  child: SupplierList(
+                    suppliers: _viewModel.suppliers,
+                    totalItems: _viewModel.totalItems ?? 0,
+                    onEdit:
+                        (supplier) =>
+                            _showEditSupplierDialog(context, supplier),
+                    onDelete:
+                        (supplier) =>
+                            _showDeleteConfirmationDialog(context, supplier),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -114,46 +114,48 @@ class _OrdersViewState extends State<OrdersView> {
 
     return RefreshIndicator(
       onRefresh: _refreshItems,
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).colorScheme.onPrimary,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
-          children: [
-            OrderSearchBar(
-              isSearching: _viewModel.isSearching,
-              initialValue: _viewModel.searchText,
-              onChange: (value) {
-                _viewModel.searchText = value;
-              },
-              onSearch: (value) => _viewModel.searchOrders(),
-            ),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: _viewModel,
-                builder: (context, child) {
-                  if (_viewModel.isSearching) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  return child!;
+      child: Center(
+        child: Container(
+          width: 1720,
+          height: double.infinity,
+          color: Theme.of(context).colorScheme.onPrimary,
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
+            children: [
+              OrderSearchBar(
+                isSearching: _viewModel.isSearching,
+                initialValue: _viewModel.searchText,
+                onChange: (value) {
+                  _viewModel.searchText = value;
                 },
-                child: OrderList(
-                  orders: _viewModel.invoiceItems,
-                  totalItems: _viewModel.totalItems ?? 0,
-                  onEdit:
-                      (invoiceItem) =>
-                          _showEditOrderDialog(context, invoiceItem),
-                  onDelete:
-                      (invoiceItem) =>
-                          _showDeleteConfirmationDialog(context, invoiceItem),
+                onSearch: (value) => _viewModel.searchOrders(),
+              ),
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: _viewModel,
+                  builder: (context, child) {
+                    if (_viewModel.isSearching) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    return child!;
+                  },
+                  child: OrderList(
+                    orders: _viewModel.invoiceItems,
+                    totalItems: _viewModel.totalItems ?? 0,
+                    onEdit:
+                        (invoiceItem) =>
+                            _showEditOrderDialog(context, invoiceItem),
+                    onDelete:
+                        (invoiceItem) =>
+                            _showDeleteConfirmationDialog(context, invoiceItem),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

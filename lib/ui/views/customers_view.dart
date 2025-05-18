@@ -121,50 +121,53 @@ class _CustomersViewState extends State<CustomersView> {
 
     return RefreshIndicator(
       onRefresh: _refreshProducts,
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: Theme.of(context).colorScheme.onPrimary,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 16,
-          children: [
-            CustomerSearchBar(
-              isSearching: _viewModel.isSearching,
-              initialValue: _viewModel.searchText,
-              onChange: (value) {
-                _viewModel.searchText = value;
-              },
-              onSearch: (value) => _viewModel.searchCustomers(),
-            ),
-            Expanded(
-              child: AnimatedBuilder(
-                animation: _viewModel,
-                builder: (context, child) {
-                  if (_viewModel.isSearching) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (_viewModel.customers.isEmpty ||
-                      _viewModel.totalItems == 0) {
-                    return CustomerNotFound();
-                  }
-
-                  return child!;
+      child: Center(
+        child: Container(
+          width: 1720,
+          height: double.infinity,
+          color: Theme.of(context).colorScheme.onPrimary,
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 16,
+            children: [
+              CustomerSearchBar(
+                isSearching: _viewModel.isSearching,
+                initialValue: _viewModel.searchText,
+                onChange: (value) {
+                  _viewModel.searchText = value;
                 },
-                child: CustomerList(
-                  customers: _viewModel.customers,
-                  totalItems: _viewModel.totalItems ?? 0,
-                  onEdit:
-                      (customer) => _showEditCustomerDialog(context, customer),
-                  onDelete:
-                      (customer) =>
-                          _showDeleteConfirmationDialog(context, customer),
+                onSearch: (value) => _viewModel.searchCustomers(),
+              ),
+              Expanded(
+                child: AnimatedBuilder(
+                  animation: _viewModel,
+                  builder: (context, child) {
+                    if (_viewModel.isSearching) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (_viewModel.customers.isEmpty ||
+                        _viewModel.totalItems == 0) {
+                      return CustomerNotFound();
+                    }
+
+                    return child!;
+                  },
+                  child: CustomerList(
+                    customers: _viewModel.customers,
+                    totalItems: _viewModel.totalItems ?? 0,
+                    onEdit:
+                        (customer) =>
+                            _showEditCustomerDialog(context, customer),
+                    onDelete:
+                        (customer) =>
+                            _showDeleteConfirmationDialog(context, customer),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
