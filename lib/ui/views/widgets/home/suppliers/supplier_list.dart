@@ -196,7 +196,7 @@ class _SupplierListState extends State<SupplierList> {
                                                 color: Colors.red,
                                               ),
                                               title: const Text(
-                                                'Excluir fornecedor',
+                                                'Desativar fornecedor',
                                                 style: TextStyle(
                                                   color: Colors.red,
                                                 ),

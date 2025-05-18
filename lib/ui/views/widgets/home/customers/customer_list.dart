@@ -196,7 +196,7 @@ class _CustomerListState extends State<CustomerList> {
                                                 color: Colors.red,
                                               ),
                                               title: const Text(
-                                                'Excluir cliente',
+                                                'Desativar cliente',
                                                 style: TextStyle(
                                                   color: Colors.red,
                                                 ),

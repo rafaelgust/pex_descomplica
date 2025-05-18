@@ -50,9 +50,9 @@ class _CustomersViewState extends State<CustomersView> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmar exclusão'),
+            title: const Text('Confirmar'),
             content: Text(
-              'Deseja realmente excluir o fornecedor "${customer.name}"?',
+              'Deseja realmente desativar o cliente "${customer.name}"?',
             ),
             actions: [
               TextButton(
@@ -68,20 +68,20 @@ class _CustomersViewState extends State<CustomersView> {
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Fornecedor excluído com sucesso'),
+                          content: Text('Cliente desativado com sucesso'),
                         ),
                       );
                       _viewModel.searchCustomers();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Erro ao excluir fornecedor'),
+                          content: Text('Erro ao desativar cliente'),
                         ),
                       );
                     }
                   });
                 },
-                child: const Text('Excluir'),
+                child: const Text('Desativar'),
               ),
             ],
           ),

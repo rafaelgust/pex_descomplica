@@ -50,9 +50,9 @@ class _SuppliersViewState extends State<SuppliersView> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Confirmar exclusão'),
+            title: const Text('Confirmar'),
             content: Text(
-              'Deseja realmente excluir o fornecedor "${supplier.name}"?',
+              'Deseja realmente desativar o fornecedor "${supplier.name}"?',
             ),
             actions: [
               TextButton(
@@ -68,20 +68,20 @@ class _SuppliersViewState extends State<SuppliersView> {
                     if (success) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Fornecedor excluído com sucesso'),
+                          content: Text('Fornecedor desativado com sucesso'),
                         ),
                       );
                       _viewModel.searchSuppliers();
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Erro ao excluir fornecedor'),
+                          content: Text('Erro ao desativar fornecedor'),
                         ),
                       );
                     }
                   });
                 },
-                child: const Text('Excluir'),
+                child: const Text('Desativar'),
               ),
             ],
           ),
