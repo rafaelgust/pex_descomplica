@@ -20,7 +20,6 @@ abstract class AuthRepository {
   Future<Either<AuthFailure, String?>> getToken();
 }
 
-// Implementação concreta do repositório
 class AuthRepositoryImpl implements AuthRepository {
   final AuthService _authService;
 
@@ -40,44 +39,6 @@ class AuthRepositoryImpl implements AuthRepository {
       }
     } catch (e) {
       return Left(AuthenticationFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<AuthFailure, bool>> register({
-    required String email,
-    required String password,
-    required String username,
-    required String firstName,
-    required String lastName,
-  }) async {
-    try {
-      // Validar email e username antes de tentar registrar
-      final isEmailValid = await _authService.checkEmail(email);
-      if (!isEmailValid) {
-        return const Left(ValidationFailure('Email already in use'));
-      }
-
-      final isUsernameValid = await _authService.checkUsername(username);
-      if (!isUsernameValid) {
-        return const Left(ValidationFailure('Username already in use'));
-      }
-
-      final result = await _authService.register(
-        email: email,
-        password: password,
-        username: username,
-        firstName: firstName,
-        lastName: lastName,
-      );
-
-      if (result) {
-        return const Right(true);
-      } else {
-        return const Left(RegistrationFailure('Registration failed'));
-      }
-    } catch (e) {
-      return Left(NetworkFailure(e.toString()));
     }
   }
 

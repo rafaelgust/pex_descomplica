@@ -103,10 +103,11 @@ class _EditProductItemDialogState extends State<EditProductItemDialog> {
         barcode:
             _barcodeController.text.isNotEmpty ? _barcodeController.text : null,
       );
-      await Future.delayed(const Duration(seconds: 1));
+
+      await _viewModel.searchProducts();
 
       if (mounted) {
-        Navigator.pop(context, true); // Retorna true para indicar sucesso
+        Navigator.pop(context, true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Produto atualizado com sucesso'),

@@ -111,9 +111,10 @@ class StockViewModel extends ChangeNotifier {
     if (isSearching) return;
 
     isSearching = true;
+    notifyListeners();
+
     products.clear();
     errorProducts = null;
-    notifyListeners();
 
     try {
       final String filter = _buildProductFilter();

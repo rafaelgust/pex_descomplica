@@ -321,7 +321,7 @@ class _SettingsViewState extends State<SettingsView>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Gerenciar Usuários',
+                      'Usuários',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -348,10 +348,25 @@ class _SettingsViewState extends State<SettingsView>
                           itemBuilder: (context, index) {
                             final user = users[index];
                             return ListTile(
-                              leading: CircleAvatar(
-                                child: Text(user.username[0]),
-                              ),
-                              title: Text(user.username),
+                              leading:
+                                  user.urlAvatar.isNotEmpty
+                                      ? CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          user.urlAvatar,
+                                        ),
+                                        backgroundColor:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.surface,
+                                      )
+                                      : const CircleAvatar(
+                                        backgroundColor: Colors.grey,
+                                        child: Icon(
+                                          Icons.person_sharp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                              title: Text(user.fullName),
                               subtitle: Text(user.email),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,

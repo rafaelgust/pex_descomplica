@@ -118,7 +118,10 @@ class Providers {
     );
 
     injector.registerLazySingleton<SettingController>(
-      () => SettingController(injector.get<UserRepository>()),
+      () => SettingController(
+        injector.get<UserRepository>(),
+        injector.get<AuthService>(),
+      ),
     );
     // ===== ViewModels =====
 
