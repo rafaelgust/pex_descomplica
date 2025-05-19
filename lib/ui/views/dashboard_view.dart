@@ -18,7 +18,9 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   final DashboardController _controller = injector.get<DashboardController>();
 
-  final List<ProductPieChart> _pieChartData = [];
+  final List<ProductPieChart> _pieChartBest = [];
+
+  final List<ProductPieChart> _pieChartAmount = [];
 
   final List<InvoicesMonthlyModel> _barChartData = [];
 
@@ -46,6 +48,10 @@ class _DashboardViewState extends State<DashboardView> {
       await _controller.init();
       _infoCards.addAll(_controller.infoCards);
       _barChartData.addAll(_controller.invoicesMonthly);
+      _pieChartAmount.clear();
+      _pieChartAmount.addAll(await _controller.getDataForPieChartStock());
+      _pieChartBest.clear();
+      _pieChartBest.addAll(await _controller.getDataForPieChartBestSellers());
       setState(() {});
     }
   }
@@ -54,6 +60,7 @@ class _DashboardViewState extends State<DashboardView> {
     if (mounted) {
       _updateInfoCards();
       _updateBarChartData();
+      _updatePieChartData();
     }
   }
 
@@ -70,6 +77,17 @@ class _DashboardViewState extends State<DashboardView> {
     if (mounted) {
       _barChartData.clear();
       _barChartData.addAll(_controller.invoicesMonthly);
+      setState(() {});
+    }
+  }
+
+  Future<void> _updatePieChartData() async {
+    if (mounted) {
+      _pieChartAmount.clear();
+      _pieChartBest.clear();
+      _pieChartAmount.addAll(await _controller.getDataForPieChartStock());
+      _pieChartBest.addAll(await _controller.getDataForPieChartBestSellers());
+
       setState(() {});
     }
   }
@@ -146,8 +164,8 @@ class _DashboardViewState extends State<DashboardView> {
                         const SizedBox(height: 40),
                         SectionCharts(
                           invoicesMonthly: _barChartData,
-                          pieChartAmountStockProducts: _pieChartData,
-                          pieChartBestSellersProducts: _pieChartData,
+                          pieChartBestSellersProducts: _pieChartBest,
+                          pieChartAmountStockProducts: _pieChartAmount,
                         ),
                         const SizedBox(height: 32),
                       ],

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 
+import '../../../config/constants.dart';
+import '../../models/dashboard/product_pie_chart.dart';
 import '../../models/invoice/invoices_monthly_model.dart';
 import '../../models/invoice_model.dart';
 import '../../services/pocket_base/pocket_base.dart';
@@ -48,6 +50,8 @@ abstract class InvoiceRepository {
 
   Future<Either<InvoiceFailure, List<InvoicesMonthlyModel>>>
   getInvoicesMonthly();
+
+  Future<Either<InvoiceFailure, List<ProductPieChart>>> getBestSellers();
 }
 
 class InvoiceRepositoryImpl implements InvoiceRepository {
@@ -317,6 +321,38 @@ class InvoiceRepositoryImpl implements InvoiceRepository {
               successResponse.items
                   .map((item) => InvoicesMonthlyModel.fromJson(item))
                   .toList();
+
+          return Right(data);
+        },
+        error: (errorResponse) {
+          return const Left(InvoiceSearchFailure('No invoices found'));
+        },
+      );
+    } catch (e) {
+      return Left(NetworkFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<InvoiceFailure, List<ProductPieChart>>> getBestSellers() async {
+    try {
+      final products = await _pocketBase.getList(
+        collection: 'top_5_best_selling_products',
+        fields: 'id, product_name, image, total_quantity',
+      );
+
+      return products.when(
+        success: (successResponse) async {
+          List<ProductPieChart> data =
+              successResponse.items.map((item) {
+                final itemMap = item as Map<String, dynamic>;
+                return ProductPieChart(
+                  name: itemMap['product_name'],
+                  amount: itemMap['total_quantity'].toDouble(),
+                  urlImage:
+                      '${Constants.urlApi}/api/files/products/${itemMap['id']}/${itemMap['image']}',
+                );
+              }).toList();
 
           return Right(data);
         },

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../data/models/dashboard/info_card_model.dart';
+import '../../data/models/dashboard/product_pie_chart.dart';
 import '../../data/models/invoice/invoices_monthly_model.dart';
 import '../../data/repositories/dashboard/dashboard_repository.dart';
 import '../../data/services/internationalization/intl_service.dart';
@@ -240,5 +241,28 @@ class DashboardController extends ChangeNotifier {
     );
     await _deleteInfoCard('MonthlyRevenue');
     await _createInfoCard(card, 'MonthlyRevenue');
+  }
+
+  Future<List<ProductPieChart>> getDataForPieChartStock() async {
+    try {
+      final result = await productController.getLastFiveProductsAmountStock();
+      final List<ProductPieChart> pieChartData = [];
+      for (var product in result) {
+        final pieChart = ProductPieChart(
+          name: product.name,
+          amount: product.quantity.toDouble(),
+          urlImage: product.urlImage!,
+        );
+        pieChartData.add(pieChart);
+      }
+      return pieChartData;
+    } catch (e) {
+      debugPrint('Error getting last five products stock amount: $e');
+      return [];
+    }
+  }
+
+  Future<List<ProductPieChart>> getDataForPieChartBestSellers() async {
+    return await invoiceController.getFiveBestSellers();
   }
 }

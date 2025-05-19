@@ -22,7 +22,7 @@ class ProductController extends ChangeNotifier {
   Future<List<ProductModel>> getLastFiveProductsAmountStock() async {
     try {
       final result = await repository.getListWithFilter(
-        filter: 'active=true',
+        filter: 'quantity>0',
         page: 1,
         perPage: 5,
         sort: '+quantity',

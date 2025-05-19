@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/dashboard/product_pie_chart.dart';
 import '../../data/models/invoice/invoices_monthly_model.dart';
 import '../../data/repositories/invoice/invoice_repository.dart';
 
@@ -62,6 +63,15 @@ class InvoiceController extends ChangeNotifier {
           return data;
         },
       );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<List<ProductPieChart>> getFiveBestSellers() async {
+    try {
+      final result = await repository.getBestSellers();
+      return result.fold((error) => [], (data) => data);
     } catch (e) {
       rethrow;
     }
