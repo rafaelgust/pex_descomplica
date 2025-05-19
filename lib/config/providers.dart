@@ -6,6 +6,7 @@ import '../data/repositories/customer/customer_repository.dart';
 import '../data/repositories/dashboard/dashboard_repository.dart';
 import '../data/repositories/invoice/invoice_repository.dart';
 import '../data/repositories/product/product_repository.dart';
+import '../data/repositories/role/role_repository.dart';
 import '../data/repositories/stock/stock_repository.dart';
 import '../data/repositories/supplier/supplier_repository.dart';
 import '../data/repositories/user/user_repository.dart';
@@ -89,6 +90,10 @@ class Providers {
       () => InvoiceRepositoryImpl(pbService),
     );
 
+    injector.registerFactory<RoleRepository>(
+      () => RoleRepositoryImpl(pbService),
+    );
+
     injector.registerFactory<DashboardRepository>(
       () => DashboardRepositoryImpl(injector.get<StorageService>()),
     );
@@ -121,6 +126,7 @@ class Providers {
       () => SettingController(
         injector.get<UserRepository>(),
         injector.get<AuthService>(),
+        injector.get<RoleRepository>(),
       ),
     );
     // ===== ViewModels =====

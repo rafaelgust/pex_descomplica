@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/models/auth/user_model.dart';
 import '../../data/services/injector/injector_service.dart';
 import '../controllers/setting_controller.dart';
+import 'widgets/home/setting/add_user_dialog.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -51,6 +52,10 @@ class _SettingsViewState extends State<SettingsView>
     },
   ];
 
+  _init() async {
+    await _loadUsers();
+  }
+
   _loadUsers() async {
     try {
       await _controller.fetchUsers();
@@ -70,7 +75,7 @@ class _SettingsViewState extends State<SettingsView>
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    _init();
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -81,219 +86,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   void _showAddUserDialog() {
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    String selectedRole = 'Convidado';
-
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Adicionar Usuário'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome',
-                      prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Função',
-                      prefixIcon: Icon(Icons.admin_panel_settings),
-                      border: OutlineInputBorder(),
-                    ),
-                    value: selectedRole,
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Administrador',
-                        child: Text('Administrador'),
-                      ),
-                      DropdownMenuItem(value: 'Gestor', child: Text('Gestor')),
-                      DropdownMenuItem(
-                        value: 'Convidado',
-                        child: Text('Convidado'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      selectedRole = value!;
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCELAR'),
-              ),
-              FilledButton(
-                onPressed: () {
-                  if (nameController.text.isNotEmpty &&
-                      emailController.text.isNotEmpty) {
-                    // Criar o usuário na lista
-                    Navigator.pop(context);
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Usuário adicionado com sucesso!'),
-                        backgroundColor: Colors.green,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                child: const Text('ADICIONAR'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showEditUserDialog(int index) {
-    final nameController = TextEditingController(
-      text: _controller.userList.value[index].username,
-    );
-    final emailController = TextEditingController(
-      text: _controller.userList.value[index].email,
-    );
-    String selectedRole = _controller.userList.value[index].role.name;
-
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Editar Usuário'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome',
-                      prefixIcon: Icon(Icons.person),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'E-mail',
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Função',
-                      prefixIcon: Icon(Icons.admin_panel_settings),
-                      border: OutlineInputBorder(),
-                    ),
-                    value: selectedRole,
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'Administrador',
-                        child: Text('Administrador'),
-                      ),
-                      DropdownMenuItem(value: 'Gestor', child: Text('Gestor')),
-                      DropdownMenuItem(
-                        value: 'Convidado',
-                        child: Text('Convidado'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      selectedRole = value!;
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('CANCELAR'),
-              ),
-              FilledButton(
-                onPressed: () {
-                  // Editar o usuário na lista
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Usuário atualizado com sucesso!'),
-                      backgroundColor: Colors.green,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-                child: const Text('SALVAR'),
-              ),
-              TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          title: const Text('Confirmar exclusão'),
-                          content: Text(
-                            'Tem certeza que deseja excluir o usuário ${_controller.userList.value[index].username}?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('CANCELAR'),
-                            ),
-                            FilledButton(
-                              onPressed: () {
-                                // Remover o usuário da lista
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Usuário removido com sucesso!',
-                                    ),
-                                    backgroundColor: Colors.red,
-                                    behavior: SnackBarBehavior.floating,
-                                  ),
-                                );
-                              },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              child: const Text('EXCLUIR'),
-                            ),
-                          ],
-                        ),
-                  );
-                },
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('EXCLUIR'),
-              ),
-            ],
-          ),
-    );
+    showDialog(context: context, builder: (context) => AddUserDialog());
   }
 
   @override
@@ -388,14 +181,37 @@ class _SettingsViewState extends State<SettingsView>
                                               : Colors.green[900],
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.edit),
-                                    onPressed: () => _showEditUserDialog(index),
-                                    tooltip: 'Editar usuário',
-                                  ),
                                 ],
                               ),
-                              onTap: () => _showEditUserDialog(index),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder:
+                                      (context) => AlertDialog(
+                                        title: const Text(
+                                          'Detalhes do Usuário',
+                                        ),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Nome: ${user.fullName}'),
+                                            Text('Usuário: ${user.username}'),
+                                            Text('Email: ${user.email}'),
+                                            Text('Função: ${user.role.name}'),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed:
+                                                () => Navigator.pop(context),
+                                            child: const Text('FECHAR'),
+                                          ),
+                                        ],
+                                      ),
+                                );
+                              },
                             );
                           },
                         );

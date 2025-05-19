@@ -33,6 +33,7 @@ abstract class UserRepository {
     required String username,
     required String email,
     required String password,
+    required String role,
     XFile? imageFile,
   });
 
@@ -58,6 +59,7 @@ class UserRepositoryImpl implements UserRepository {
     required String username,
     required String email,
     required String password,
+    required String role,
     XFile? imageFile,
   }) async {
     try {
@@ -68,8 +70,8 @@ class UserRepositoryImpl implements UserRepository {
         'username': username,
         'first_name': firstName,
         'last_name': lastName,
-        "emailVisibility": false,
-        "verified": false,
+        'role': role,
+        "emailVisibility": true,
       };
       dynamic file;
 
@@ -77,7 +79,7 @@ class UserRepositoryImpl implements UserRepository {
         final fileName = imageFile.path.split('/').last;
         file = await _httpService.createMultipartFile(
           xfile: XFile(imageFile.path, name: fileName),
-          fieldName: 'image',
+          fieldName: 'avatar',
         );
       } else {
         file = null;
