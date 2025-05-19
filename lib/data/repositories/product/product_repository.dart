@@ -21,6 +21,7 @@ abstract class ProductRepository {
     required String filter,
     required int page,
     required int perPage,
+    String? sort,
   });
 
   Future<Either<ProductFailure, List<ProductModel>>> getList({
@@ -269,6 +270,7 @@ class ProductRepositoryImpl implements ProductRepository {
     required String filter,
     required int page,
     required int perPage,
+    String? sort,
   }) async {
     try {
       final products = await _pocketBase.getList(
@@ -277,7 +279,7 @@ class ProductRepositoryImpl implements ProductRepository {
         perPage: perPage,
         filter: filter,
         expand: 'category',
-        sort: '-updated',
+        sort: sort ?? '-updated',
       );
 
       return products.when(
