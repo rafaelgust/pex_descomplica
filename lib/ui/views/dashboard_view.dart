@@ -18,25 +18,7 @@ class DashboardView extends StatefulWidget {
 class _DashboardViewState extends State<DashboardView> {
   final DashboardController _controller = injector.get<DashboardController>();
 
-  final List<ProductPieChart> _pieChartData = [
-    ProductPieChart(
-      name: 'Café',
-      amount: 60,
-      urlImage:
-          'https://castronaves.vteximg.com.br/arquivos/ids/384748-1000-1000/9330_01.jpg',
-    ),
-    ProductPieChart(
-      name: 'Açúcar',
-      amount: 120,
-      urlImage:
-          'https://carrefourbrfood.vtexassets.com/arquivos/ids/110671165/acucar-refinado-uniao-docucar-1kg-1.jpg',
-    ),
-    ProductPieChart(
-      name: 'Arroz',
-      amount: 50,
-      urlImage: 'https://m.media-amazon.com/images/I/71rBEHnIkXL.jpg',
-    ),
-  ];
+  final List<ProductPieChart> _pieChartData = [];
 
   final List<InvoicesMonthlyModel> _barChartData = [];
 
@@ -132,9 +114,8 @@ class _DashboardViewState extends State<DashboardView> {
                 padding: const EdgeInsets.all(24),
                 physics: const BouncingScrollPhysics(),
                 child: Center(
-                  child: Container(
+                  child: SizedBox(
                     width: 1720,
-                    constraints: const BoxConstraints(maxWidth: 1720),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -165,7 +146,8 @@ class _DashboardViewState extends State<DashboardView> {
                         const SizedBox(height: 40),
                         SectionCharts(
                           invoicesMonthly: _barChartData,
-                          pieChartData: _pieChartData,
+                          pieChartAmountStockProducts: _pieChartData,
+                          pieChartBestSellersProducts: _pieChartData,
                         ),
                         const SizedBox(height: 32),
                       ],

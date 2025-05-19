@@ -9,12 +9,14 @@ import 'charts/pie_chart_widget.dart';
 import 'section_header.dart';
 
 class SectionCharts extends StatelessWidget {
-  final List<ProductPieChart> pieChartData;
+  final List<ProductPieChart> pieChartBestSellersProducts;
+  final List<ProductPieChart> pieChartAmountStockProducts;
   final List<InvoicesMonthlyModel> invoicesMonthly;
 
   const SectionCharts({
     super.key,
-    required this.pieChartData,
+    required this.pieChartAmountStockProducts,
+    required this.pieChartBestSellersProducts,
     required this.invoicesMonthly,
   });
 
@@ -82,7 +84,6 @@ class SectionCharts extends StatelessWidget {
                       MediaQuery.of(context).size.width < 900
                           ? 500
                           : MediaQuery.of(context).size.width - 48,
-
                   height: 400,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -96,7 +97,20 @@ class SectionCharts extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: PieChartWidget(products: pieChartData),
+                  child:
+                      pieChartBestSellersProducts.isEmpty
+                          ? const Center(
+                            child: Text(
+                              'Nenhum dado encontrado',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          )
+                          : PieChartWidget(
+                            products: pieChartBestSellersProducts,
+                          ),
                 ),
               ],
             ),
@@ -138,6 +152,51 @@ class SectionCharts extends StatelessWidget {
                       MonthlyBarChart(month: 'Jun', entrada: 10, saida: 11),
                     ],
                   ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SectionHeader(
+                  title: 'Produtos em Estoque',
+                  icon: Icons.pie_chart,
+                ),
+                Container(
+                  width:
+                      MediaQuery.of(context).size.width < 900
+                          ? 500
+                          : MediaQuery.of(context).size.width - 48,
+                  height: 400,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child:
+                      pieChartAmountStockProducts.isEmpty
+                          ? const Center(
+                            child: Text(
+                              'Nenhum dado encontrado',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          )
+                          : PieChartWidget(
+                            products: pieChartAmountStockProducts,
+                          ),
                 ),
               ],
             ),
