@@ -48,9 +48,7 @@ class _DashboardViewState extends State<DashboardView> {
       await _controller.init();
       _infoCards.addAll(_controller.infoCards);
       _barChartData.addAll(_controller.invoicesMonthly);
-      _pieChartAmount.clear();
       _pieChartAmount.addAll(await _controller.getDataForPieChartStock());
-      _pieChartBest.clear();
       _pieChartBest.addAll(await _controller.getDataForPieChartBestSellers());
       setState(() {});
     }

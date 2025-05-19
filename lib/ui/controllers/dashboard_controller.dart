@@ -24,7 +24,7 @@ class DashboardController extends ChangeNotifier {
   final List<InfoCardModel> infoCards = [];
   final List<InvoicesMonthlyModel> invoicesMonthly = [];
 
-  bool isLoading = false;
+  bool isLoading = true;
 
   Future<void> init() async {
     try {
@@ -35,29 +35,6 @@ class DashboardController extends ChangeNotifier {
       debugPrint('Error initializing dashboard: $e');
     } finally {
       isLoading = false;
-    }
-  }
-
-  Future<void> getInfoCards() async {
-    try {
-      final List<InfoCardModel> newCards = [];
-
-      final stockAmount = await getInfoCardById('StockAmount');
-      final debts = await getInfoCardById('Debts');
-      final pendingOrders = await getInfoCardById('PendingOrders');
-      final monthlyRevenue = await getInfoCardById('MonthlyRevenue');
-
-      if (stockAmount != null) newCards.add(stockAmount);
-      if (debts != null) newCards.add(debts);
-      if (pendingOrders != null) newCards.add(pendingOrders);
-      if (monthlyRevenue != null) newCards.add(monthlyRevenue);
-
-      if (newCards.isNotEmpty) {
-        infoCards.clear();
-        infoCards.addAll(newCards);
-      }
-    } catch (e) {
-      debugPrint('Error getting info cards: $e');
     }
   }
 
@@ -89,17 +66,36 @@ class DashboardController extends ChangeNotifier {
     }
   }
 
-  Future<void> updateInfoCards() async {
+  Future<void> getInfoCards() async {
     try {
-      await updateStockAmount();
-      await updateDebts();
-      await updatePendingOrders();
-      await updateMonthlyRevenue();
+      final List<InfoCardModel> newCards = [];
 
-      await getInfoCards();
+      final stockAmount = await getInfoCardById('StockAmount');
+      final debts = await getInfoCardById('Debts');
+      final pendingOrders = await getInfoCardById('PendingOrders');
+      final monthlyRevenue = await getInfoCardById('MonthlyRevenue');
+
+      if (stockAmount != null) newCards.add(stockAmount);
+      if (debts != null) newCards.add(debts);
+      if (pendingOrders != null) newCards.add(pendingOrders);
+      if (monthlyRevenue != null) newCards.add(monthlyRevenue);
+
+      if (newCards.isNotEmpty) {
+        infoCards.clear();
+        infoCards.addAll(newCards);
+      }
     } catch (e) {
-      debugPrint('Error updating info cards: $e');
+      debugPrint('Error getting info cards: $e');
     }
+  }
+
+  Future<void> updateInfoCards() async {
+    await updateStockAmount();
+    await updateMonthlyRevenue();
+    await updateDebts();
+    await updatePendingOrders();
+
+    await getInfoCards();
   }
 
   Future<void> _createInfoCard(InfoCardModel card, String id) async {
@@ -159,49 +155,61 @@ class DashboardController extends ChangeNotifier {
 
   // InfoCard Basic
   Future<void> updateStockAmount() async {
-    final quantity = await productController.getAmountProductsInStock();
-    final card = InfoCardModel(
-      title: 'Total de Produtos em Estoque',
-      info: quantity.toString(),
-      value: '',
-      type: 'itens',
-      icon: Icons.inventory_2,
-      color: const Color(0xFF3182CE),
-    );
-    await _deleteInfoCard('StockAmount');
-    await _createInfoCard(card, 'StockAmount');
+    try {
+      final quantity = await productController.getAmountProductsInStock();
+      final card = InfoCardModel(
+        title: 'Total de Produtos em Estoque',
+        info: quantity.toString(),
+        value: '',
+        type: 'itens',
+        icon: Icons.inventory_2,
+        color: const Color(0xFF3182CE),
+      );
+      await _deleteInfoCard('StockAmount');
+      await _createInfoCard(card, 'StockAmount');
+    } catch (e) {
+      debugPrint('Error getting products in stock: $e');
+    }
   }
 
   Future<void> updateDebts() async {
-    final result =
-        await invoiceController.getAmountSuppliersWithPaymentPending();
+    try {
+      final result =
+          await invoiceController.getAmountSuppliersWithPaymentPending();
 
-    final card = InfoCardModel(
-      title: 'Débitos com Fornecedores',
-      info: result['amount'].toString(),
-      value: formatCurrency(result['value'].toInt()),
-      type: result['amount'].toInt() == 1 ? 'pendência' : 'pendências',
-      icon: Icons.warning_amber,
-      color: const Color(0xFFDD6B20),
-    );
-    await _deleteInfoCard('Debts');
-    await _createInfoCard(card, 'Debts');
+      final card = InfoCardModel(
+        title: 'Débitos com Fornecedores',
+        info: result['amount'].toString(),
+        value: formatCurrency(result['value'].toInt()),
+        type: result['amount'].toInt() == 1 ? 'pendência' : 'pendências',
+        icon: Icons.warning_amber,
+        color: const Color(0xFFDD6B20),
+      );
+      await _deleteInfoCard('Debts');
+      await _createInfoCard(card, 'Debts');
+    } catch (e) {
+      debugPrint('Error getting suppliers with payment pending: $e');
+    }
   }
 
   Future<void> updatePendingOrders() async {
-    final result =
-        await invoiceController.getAmountCustomersWithPaymentPending();
+    try {
+      final result =
+          await invoiceController.getAmountCustomersWithPaymentPending();
 
-    final card = InfoCardModel(
-      title: 'Vendas Pendentes',
-      info: result['amount'].toString(),
-      value: formatCurrency(result['value'].toInt()),
-      type: result['amount'].toInt() == 1 ? 'venda' : 'vendas',
-      icon: Icons.shopping_cart,
-      color: const Color(0xFF2F855A),
-    );
-    await _deleteInfoCard('PendingOrders');
-    await _createInfoCard(card, 'PendingOrders');
+      final card = InfoCardModel(
+        title: 'Vendas Pendentes',
+        info: result['amount'].toString(),
+        value: formatCurrency(result['value'].toInt()),
+        type: result['amount'].toInt() == 1 ? 'venda' : 'vendas',
+        icon: Icons.shopping_cart,
+        color: const Color(0xFF2F855A),
+      );
+      await _deleteInfoCard('PendingOrders');
+      await _createInfoCard(card, 'PendingOrders');
+    } catch (e) {
+      debugPrint('Error getting customers with payment pending: $e');
+    }
   }
 
   Future<void> updateMonthlyRevenue() async {
@@ -211,36 +219,41 @@ class DashboardController extends ChangeNotifier {
     final monthName = monthToString(monthNumber);
     final yearNumber = dateNow.year;
 
-    final result = await _getMonthlyRevenueData();
+    try {
+      final result = await _getMonthlyRevenueData();
 
-    invoicesMonthly.clear();
-    invoicesMonthly.addAll(result);
+      invoicesMonthly.clear();
+      invoicesMonthly.addAll(result);
 
-    final monthRevenue = result.firstWhere(
-      (item) => item.month == monthNumber && item.year == yearNumber,
-      orElse:
-          () => InvoicesMonthlyModel(
-            year: yearNumber,
-            month: monthNumber,
-            totalMovements: 0,
-            totalQuantity: 0,
-            totalValue: 0,
-          ),
-    );
+      final monthRevenue = result.firstWhere(
+        (item) => item.month == monthNumber && item.year == yearNumber,
+        orElse:
+            () => InvoicesMonthlyModel(
+              year: yearNumber,
+              month: monthNumber,
+              totalMovements: 0,
+              totalQuantity: 0,
+              totalValue: 0,
+            ),
+      );
 
-    final card = InfoCardModel(
-      title: 'Faturamento Mensal',
-      info: '$monthName/$yearNumber',
-      value: formatCurrency(monthRevenue.totalValue),
-      type:
-          monthRevenue.totalMovements == 1
-              ? '${monthRevenue.totalMovements} saída'
-              : '${monthRevenue.totalMovements} saídas',
-      icon: Icons.attach_money,
-      color: const Color(0xFF6B46C1),
-    );
-    await _deleteInfoCard('MonthlyRevenue');
-    await _createInfoCard(card, 'MonthlyRevenue');
+      final card = InfoCardModel(
+        title: 'Faturamento Mensal',
+        info: '$monthName/$yearNumber',
+        value: formatCurrency(monthRevenue.totalValue),
+        type:
+            monthRevenue.totalMovements == 1
+                ? '${monthRevenue.totalMovements} saída'
+                : '${monthRevenue.totalMovements} saídas',
+        icon: Icons.attach_money,
+        color: const Color(0xFF6B46C1),
+      );
+
+      await _deleteInfoCard('MonthlyRevenue');
+      await _createInfoCard(card, 'MonthlyRevenue');
+    } catch (e) {
+      debugPrint('Error getting monthly revenue: $e');
+    }
   }
 
   Future<List<ProductPieChart>> getDataForPieChartStock() async {
