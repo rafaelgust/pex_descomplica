@@ -170,19 +170,6 @@ class _StockListState extends State<StockList> {
                 ),
               ),
               Spacer(),
-              OutlinedButton.icon(
-                onPressed: () {
-                  // Implementar exportação
-                },
-                icon: const Icon(Icons.download),
-                label: const Text('Exportar'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
             ],
           ),
         ),
