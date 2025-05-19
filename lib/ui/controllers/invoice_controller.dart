@@ -18,8 +18,12 @@ class InvoiceController extends ChangeNotifier {
           return data;
         },
         (total) {
+          if (total['total_value'] == null) {
+            data['value'] = 0;
+          } else {
+            data['value'] = total['total_value'];
+          }
           data['amount'] = total['total_invoices'];
-          data['value'] = total['total_value'];
 
           return data;
         },
@@ -38,8 +42,13 @@ class InvoiceController extends ChangeNotifier {
           return data;
         },
         (total) {
+          if (total['total_value'] == null) {
+            data['value'] = 0;
+          } else {
+            data['value'] = total['total_value'];
+          }
+
           data['amount'] = total['total_invoices'];
-          data['value'] = total['total_value'];
 
           return data;
         },
