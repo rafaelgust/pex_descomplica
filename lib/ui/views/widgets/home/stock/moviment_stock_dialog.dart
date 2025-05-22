@@ -46,6 +46,24 @@ class _MovimentStockDialogState extends State<MovimentStockDialog> {
     }
   }
 
+  String? getLastEntryPrice() {
+    if (_movimentStock.isEmpty) return null;
+    final lastEntry = _movimentStock.lastWhere(
+      (stock) => stock.movementType == 'Entrada',
+      orElse: () => _movimentStock.last,
+    );
+    return formatCurrency(lastEntry.price);
+  }
+
+  String? getLastExitPrice() {
+    if (_movimentStock.isEmpty) return null;
+    final lastExit = _movimentStock.lastWhere(
+      (stock) => stock.movementType == 'Saída',
+      orElse: () => _movimentStock.last,
+    );
+    return formatCurrency(lastExit.price);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -151,7 +169,7 @@ class _MovimentStockDialogState extends State<MovimentStockDialog> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'R\$ 0,00',
+                                getLastEntryPrice() ?? 'R\$ 0,00',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   color: theme.colorScheme.primary,
                                 ),
@@ -167,7 +185,7 @@ class _MovimentStockDialogState extends State<MovimentStockDialog> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                'R\$ 0,00',
+                                getLastExitPrice() ?? 'R\$ 0,00',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   color: theme.colorScheme.primary,
                                 ),

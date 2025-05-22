@@ -1,4 +1,4 @@
-import '../../config/constants.dart';
+import '../../core/config/constants.dart';
 import 'category_model.dart';
 
 class ProductModel {

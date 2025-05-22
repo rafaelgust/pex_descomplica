@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'config/providers.dart';
-import 'config/routers.dart';
+import 'core/config/providers.dart';
+import 'core/config/routers.dart';
 import 'core/controllers/app_controller.dart';
 import 'data/services/injector/injector_service.dart';
 import 'data/services/pocket_base/pocket_base.dart';
@@ -59,7 +59,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         routerConfig: appRouter(),
         locale: const Locale('pt', 'BR'),
-        theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.red),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: Colors.greenAccent,
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );

@@ -1,35 +1,35 @@
 import 'package:flutter/foundation.dart';
 
-import '../data/repositories/auth/auth_repository.dart';
-import '../data/repositories/category/category_repository.dart';
-import '../data/repositories/customer/customer_repository.dart';
-import '../data/repositories/dashboard/dashboard_repository.dart';
-import '../data/repositories/invoice/invoice_repository.dart';
-import '../data/repositories/product/product_repository.dart';
-import '../data/repositories/role/role_repository.dart';
-import '../data/repositories/stock/stock_repository.dart';
-import '../data/repositories/supplier/supplier_repository.dart';
-import '../data/repositories/user/user_repository.dart';
-import '../data/services/auth_service.dart';
-import '../data/services/image_picker/image_picker_service.dart';
-import '../data/services/injector/injector_service.dart';
+import '../../data/repositories/auth/auth_repository.dart';
+import '../../data/repositories/category/category_repository.dart';
+import '../../data/repositories/customer/customer_repository.dart';
+import '../../data/repositories/dashboard/dashboard_repository.dart';
+import '../../data/repositories/invoice/invoice_repository.dart';
+import '../../data/repositories/product/product_repository.dart';
+import '../../data/repositories/role/role_repository.dart';
+import '../../data/repositories/stock/stock_repository.dart';
+import '../../data/repositories/supplier/supplier_repository.dart';
+import '../../data/repositories/user/user_repository.dart';
+import '../../data/services/auth_service.dart';
+import '../../data/services/image_picker/image_picker_service.dart';
+import '../../data/services/injector/injector_service.dart';
 
-import '../data/services/http_service.dart';
-import '../data/services/jwt/jwt_service.dart';
-import '../data/services/pocket_base/pocket_base.dart';
-import '../data/services/storage/cookie_storage_service_imp.dart';
-import '../data/services/storage/secure_storage_storage_service_imp.dart';
-import '../data/services/storage/storage_service.dart';
-import '../ui/controllers/dashboard_controller.dart';
-import '../ui/controllers/invoice_controller.dart';
-import '../ui/controllers/product_controller.dart';
-import '../ui/controllers/setting_controller.dart';
-import '../ui/view_models/customer_view_model.dart';
-import '../ui/view_models/home_view_model.dart';
-import '../ui/view_models/order_view_model.dart';
-import '../ui/controllers/user_controller.dart';
-import '../ui/view_models/stock_view_model.dart';
-import '../ui/view_models/supplier_view_model.dart';
+import '../../data/services/http_service.dart';
+import '../../data/services/jwt/jwt_service.dart';
+import '../../data/services/pocket_base/pocket_base.dart';
+import '../../data/services/storage/cookie_storage_service_imp.dart';
+import '../../data/services/storage/secure_storage_storage_service_imp.dart';
+import '../../data/services/storage/storage_service.dart';
+import '../../ui/controllers/dashboard_controller.dart';
+import '../../ui/controllers/invoice_controller.dart';
+import '../../ui/controllers/product_controller.dart';
+import '../../ui/controllers/setting_controller.dart';
+import '../../ui/view_models/customer_view_model.dart';
+import '../../ui/view_models/home_view_model.dart';
+import '../../ui/view_models/order_view_model.dart';
+import '../../ui/controllers/user_controller.dart';
+import '../../ui/view_models/stock_view_model.dart';
+import '../../ui/view_models/supplier_view_model.dart';
 
 class Providers {
   static Future<void> setupControllers() async {

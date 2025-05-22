@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'package:pocketbase/pocketbase.dart';
 
-import '../../../config/constants.dart';
+import '../../../core/config/constants.dart';
 import '../storage/secure_storage_storage_service_imp.dart';
 import '../storage/storage_service.dart';
 

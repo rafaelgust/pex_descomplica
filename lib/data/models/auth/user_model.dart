@@ -1,4 +1,4 @@
-import '../../../config/constants.dart';
+import '../../../core/config/constants.dart';
 import 'role_model.dart';
 
 class UserModel {

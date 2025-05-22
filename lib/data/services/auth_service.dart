@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../../config/providers.dart';
+import '../../core/config/providers.dart';
 import '../models/auth/user_model.dart';
 import 'http_service.dart';
 import 'jwt/jwt_service.dart';

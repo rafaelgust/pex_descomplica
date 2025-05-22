@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../config/routers.dart';
+import '../../core/config/routers.dart';
 import '../../data/models/auth/user_model.dart';
 import '../../data/repositories/auth/auth_repository.dart';
 import '../../data/repositories/user/user_repository.dart';

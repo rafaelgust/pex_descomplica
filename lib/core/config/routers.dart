@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/services/auth_service.dart';
+import '../../data/services/auth_service.dart';
 
-import '../data/services/injector/injector_service.dart';
+import '../../data/services/injector/injector_service.dart';
 
-import '../ui/views/customers_view.dart';
-import '../ui/views/dashboard_view.dart';
+import '../../ui/views/customers_view.dart';
+import '../../ui/views/dashboard_view.dart';
 
-import '../ui/views/login_view.dart';
-import '../ui/views/orders_view.dart';
-import '../ui/views/profile_view.dart';
-import '../ui/views/settings_view.dart';
-import '../ui/views/stock_view.dart';
-import '../ui/views/suppliers_view.dart';
-import '../ui/views/widgets/nav_rail_page.dart';
+import '../../ui/views/login_view.dart';
+import '../../ui/views/orders_view.dart';
+import '../../ui/views/profile_view.dart';
+import '../../ui/views/settings_view.dart';
+import '../../ui/views/stock_view.dart';
+import '../../ui/views/suppliers_view.dart';
+import '../../ui/views/widgets/nav_rail_page.dart';
 
 class Routers {
   // method go and back route

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../config/constants.dart';
+import '../../core/config/constants.dart';
 import '../responsive_helper.dart';
-import '../../config/routers.dart';
+import '../../core/config/routers.dart';
 import '../view_models/login_view_model.dart';
 import 'widgets/model_button.dart';
 import 'widgets/model_text_field.dart';

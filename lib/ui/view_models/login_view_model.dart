@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 
-import '../../config/routers.dart';
+import '../../core/config/routers.dart';
 import '../../data/repositories/auth/auth_failure.dart';
 import '../../data/repositories/auth/auth_repository.dart';
 import '../../data/services/injector/injector_service.dart';

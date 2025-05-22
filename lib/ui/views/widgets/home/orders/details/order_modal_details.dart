@@ -63,7 +63,7 @@ class _OrderModalDetailsState extends State<OrderModalDetails> {
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
                 title: const Text(
-                  'Excluir Pedido',
+                  'Remover Ordem',
                   style: TextStyle(color: Colors.red),
                 ),
                 shape: RoundedRectangleBorder(

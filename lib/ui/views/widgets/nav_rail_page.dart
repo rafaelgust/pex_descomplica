@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../config/routers.dart';
+import '../../../core/config/routers.dart';
 import '../../../data/services/injector/injector_service.dart';
 import '../../responsive_helper.dart';
 import '../../view_models/home_view_model.dart';
